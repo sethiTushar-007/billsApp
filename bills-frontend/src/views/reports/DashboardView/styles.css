@@ -1,0 +1,15 @@
+#add-item{
+    padding: 10px;
+    float: left;
+    height: 100%;
+    margin-left: 30px;
+    margin-top: 18px;
+}
+
+.tableEdit {
+    display: none;
+}
+
+.tableRow:hover .tableEdit {
+    display: block;
+}

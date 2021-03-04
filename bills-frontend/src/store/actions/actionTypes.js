@@ -1,0 +1,8 @@
+export const AUTH_START = 'AUTH_START';
+export const AUTH_SUCCESS = 'AUTH_SUCCESS';
+export const AUTH_FAIL = 'AUTH_FAIL';
+export const AUTH_LOGOUT = 'AUTH_LOGOUT';
+export const BILLSET_UPDATE = 'BILLSET_UPDATE';
+export const ITEMSET_UPDATE = 'ITEMSET_UPDATE';
+export const CUSTOMERSET_UPDATE = 'CUSTOMERSET_UPDATE';
+export const USER_ADDED = 'USER_ADDED';

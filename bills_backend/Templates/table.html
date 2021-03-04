@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>Table</title>
+    <style>
+        h2 {
+            font-family: arial, sans-serif;
+        }
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <h2>{{heading}}</h2>
+    <table>
+        <tr>
+            {% for header in headers %}
+            <th>{{header}}</th>
+            {% endfor %}
+        </tr>
+        {% for d in data %}
+        <tr>
+            {% for i in d %}
+            <td>{{i}}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

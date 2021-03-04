@@ -1,0 +1,238 @@
+import React from 'react';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
+import * as Yup from 'yup';
+import { Formik } from 'formik';
+import { connect } from 'react-redux';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Container,
+  FormHelperText,
+  Link,
+  TextField,
+  Typography,
+  makeStyles
+} from '@material-ui/core';
+import Page from '../../components/Page';
+import * as actions from '../../store/actions/auth';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    backgroundColor: theme.palette.background.dark,
+    height: '100%',
+    paddingBottom: theme.spacing(3),
+    paddingTop: theme.spacing(3)
+   },
+   avatar: {
+       height: 100,
+       width: 100
+   }
+}));
+
+const RegisterView = (props) => {
+  const classes = useStyles();
+  const history = useHistory();
+
+  return (
+    <Page
+      className={classes.root}
+      title="Register"
+      >
+      <Box
+        display="flex"
+        flexDirection="column"
+        height="100%"
+        justifyContent="center"
+      >
+        <Container maxWidth="sm">
+          <Formik
+            initialValues={{
+              email: '',
+              username: '',
+              password1: '',
+              password2: '',
+              policy: false
+            }}
+            validationSchema={
+              Yup.object().shape({
+                email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+                username: Yup.string().max(255).required('Username is required'),
+                password1: Yup.string().max(255).required('Password is required'),
+                password2: Yup.string().max(255).required('Password is required'),
+                policy: Yup.boolean().oneOf([true], 'This field must be checked')
+              })
+            }
+            onSubmit={(values, {setSubmitting}) => {
+                props.onAuth(values.username, values.email,
+                    values.password1, values.password2, null, props.handleMessageSnackbar);
+                setTimeout(() => {
+                    setSubmitting(false);
+                }, 3000);
+            }}
+          >
+            {({
+              errors,
+              handleBlur,
+              handleChange,
+              handleSubmit,
+              isSubmitting,
+              touched,
+              values
+            }) => (
+              <form onSubmit={handleSubmit}>
+                <Box mb={3}>
+                  <Typography
+                    color="textPrimary"
+                    variant="h2"
+                  >
+                    Create new account
+                  </Typography>
+                  <Typography
+                    color="textSecondary"
+                    gutterBottom
+                    variant="body2"
+                  >
+                    Use your email to create new account
+                  </Typography>
+            </Box>
+                <TextField
+                  error={Boolean(touched.username && errors.username)}
+                  fullWidth
+                  required
+                  helperText={touched.username && errors.username}
+                  label="Username"
+                  margin="normal"
+                  name="username"
+                  id="username"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.username}
+                  variant="outlined"
+                />
+                <TextField
+                  error={Boolean(touched.email && errors.email)}
+                  fullWidth
+                  required
+                  helperText={touched.email && errors.email}
+                  label="Email Address"
+                  margin="normal"
+                  name="email"
+                  id="email"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  type="email"
+                  value={values.email}
+                  variant="outlined"
+                />
+                <TextField
+                  error={Boolean(touched.password1 && errors.password1)}
+                  fullWidth
+                  helperText={touched.password1 && errors.password1}
+                  required
+                  label="Set Password"
+                  margin="normal"
+                  name="password1"
+                  id="password1"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  type="password"
+                  value={values.password1}
+                  variant="outlined"
+                />
+                <TextField
+                    error={Boolean(touched.password2 && errors.password2)}
+                    fullWidth
+                    required
+                    helperText={touched.password2 && errors.password2}
+                    label="Confirm Password"
+                    margin="normal"
+                    name="password2"
+                    id="password2"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    type="password"
+                    value={values.password2}
+                    variant="outlined"
+                />
+                <Box
+                  alignItems="center"
+                  display="flex"
+                  ml={-1}
+                >
+                  <Checkbox
+                    checked={values.policy}
+                    name="policy"
+                    onChange={handleChange}
+                  />
+                  <Typography
+                    color="textSecondary"
+                    variant="body1"
+                  >
+                    I have read the
+                    {' '}
+                    <Link
+                      color="primary"
+                      component={RouterLink}
+                      to="#"
+                      underline="always"
+                      variant="h6"
+                    >
+                      Terms and Conditions
+                    </Link>
+                  </Typography>
+                </Box>
+                {Boolean(touched.policy && errors.policy) && (
+                  <FormHelperText error>
+                    {errors.policy}
+                  </FormHelperText>
+                )}
+                <Box my={2}>
+                  <Button
+                    color="primary"
+                    disabled={isSubmitting}
+                    fullWidth
+                    size="large"
+                    type="submit"
+                    variant="contained"
+                  >
+                    Sign up now
+                  </Button>
+                </Box>
+                <Typography
+                  color="textSecondary"
+                  variant="body1"
+                >
+                  Have an account?
+                  {' '}
+                  <Link
+                    component={RouterLink}
+                    to="/login"
+                    variant="h6"
+                  >
+                    Sign in
+                  </Link>
+                </Typography>
+              </form>
+            )}
+          </Formik>
+        </Container>
+      </Box>
+    </Page>
+  );
+};
+
+const mapStateToProps = (state) => {
+    return {
+        loading: state.loading,
+        error: state.error
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        onAuth: (username, email, password1, password2, avatar, handleMessageSnackbar) => dispatch(actions.authSignup(username, email, password1, password2, avatar, handleMessageSnackbar))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(RegisterView);

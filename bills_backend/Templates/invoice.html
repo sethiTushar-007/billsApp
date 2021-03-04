@@ -1,0 +1,509 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>Invoice</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700&subset=cyrillic,cyrillic-ext,latin,greek-ext,greek,latin-ext,vietnamese");
+        @import url("https://fonts.googleapis.com/css?family=Open+Sans:400italic");
+        
+        .container {
+            font: normal 13px/1.4em 'Open Sans', Sans-serif;
+            margin: 0 auto;
+            min-height: 1078px;
+        }
+
+        .print-table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        .print-table th, .print-table td {
+            text-align: left;
+            font-weight: normal;
+            vertical-align: middle;
+        }
+
+        a img {
+            border: none;
+        }
+
+        article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+            display: block;
+        }
+
+        .clearfix {
+            display: block;
+            clear: both;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        b, strong, .bold {
+            font-weight: bold;
+        }
+
+        .invoice-top {
+            background: black;
+            color: black;
+            padding: 40px 40px 30px 40px;
+        }
+
+        .invoice-body {
+            margin: -3px;
+            padding: 50px 40px 40px 40px;
+        }
+
+        .memo .company-info {
+            float: right;
+            text-align: right;
+        }
+
+        .memo .company-info .company-name {
+            color: #F8ED31;
+            font-weight: bold;
+            font-size: 32px;
+        }
+
+        .memo .company-info .spacer {
+            height: 15px;
+            display: block;
+        }
+
+        .memo .company-info div {
+            font-size: 12px;
+            float: right;
+            margin: 0 3px 3px 0;
+        }
+
+        .memo:after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+
+        .invoice-info {
+            float: left;
+            margin-top: 50px;
+        }
+
+            .invoice-info > div {
+                float: left;
+            }
+
+                .invoice-info > div > span {
+                    display: block;
+                    min-width: 100px;
+                    min-height: 18px;
+                    margin-bottom: 3px;
+                }
+
+                .invoice-info > div:last-of-type {
+                    margin-left: 10px;
+                    text-align: right;
+                }
+
+            .invoice-info:after {
+                content: '';
+                display: block;
+                clear: both;
+            }
+
+        .client-info {
+            float: right;
+            margin-top: 50px;
+            margin-right: 30px;
+            min-width: 220px;
+        }
+
+            .client-info > div {
+                margin-bottom: 3px;
+            }
+
+            .client-info span {
+                display: block;
+            }
+
+            .client-info > span {
+                margin-bottom: 3px;
+            }
+
+        .invoice-title-number {
+            margin-top: 30px;
+        }
+
+            .invoice-title-number .title {
+                margin-right: 5px;
+                text-align: right;
+                font-size: 35px;
+            }
+
+            .invoice-title-number .number {
+                margin-left: 5px;
+                text-align: left;
+                font-size: 20px;
+            }
+
+        .print-table {
+            table-layout: fixed;
+        }
+
+            .print-table th, .print-table td {
+                vertical-align: top;
+                word-break: keep-all;
+                word-wrap: break-word;
+            }
+
+        .items .first-cell, #items table th:first-child, .items table td:first-child {
+            width: 8%;
+            text-align: left;
+        }
+
+        .items table {
+            border-collapse: separate;
+            width: 100%;
+        }
+
+            .items table th {
+                font-weight: bold;
+                padding: 12px 10px;
+                text-align: right;
+                border-bottom: 1px solid #444;
+                text-transform: uppercase;
+            }
+
+                .items table th:nth-child(2) {
+                    width: 30%;
+                    text-align: left;
+                }
+
+                .items table th:last-child {
+                    text-align: right;
+                }
+
+            .items table td {
+                border-right: 1px solid #b6b6b6;
+                padding: 15px 10px;
+                text-align: right;
+            }
+
+                .items table td:first-child {
+                    text-align: left;
+                    border-right: none !important;
+                }
+
+                .items table td:nth-child(2) {
+                    text-align: left;
+                }
+
+                .items table td:last-child {
+                    border-right: none !important;
+                }
+
+        .sums {
+            float: right;
+            margin-top: 30px;
+        }
+
+            .sums table tr th, .sums table tr td {
+                min-width: 100px;
+                padding: 10px;
+                text-align: right;
+                font-weight: bold;
+                font-size: 14px;
+            }
+
+            .sums table tr th {
+                text-align: left;
+                padding-right: 25px;
+                color: #707070;
+            }
+
+            .sums table tr td:last-child {
+                min-width: 0 !important;
+                max-width: 0 !important;
+                width: 0 !important;
+                padding: 0 !important;
+                overflow: visible;
+            }
+
+            .sums table tr.amount-total th {
+                color: black;
+            }
+
+            .sums table tr.amount-total th, .sums table tr.amount-total td {
+                font-weight: bold;
+            }
+
+                .sums table tr.amount-total td:last-child {
+                    position: relative;
+                }
+
+                    .sums table tr.amount-total td:last-child .currency {
+                        position: absolute;
+                        top: 3px;
+                        left: -740px;
+                        font-weight: normal;
+                        font-style: italic;
+                        font-size: 12px;
+                        color: #707070;
+                    }
+
+                    .sums table tr.amount-total td:last-child:before {
+                        display: block;
+                        content: '';
+                        border-top: 1px solid #444;
+                        position: absolute;
+                        top: 0;
+                        left: -740px;
+                        right: 0;
+                    }
+
+            .sums table tr:last-child th, .sums table tr:last-child td {
+                color: black;
+            }
+
+        .terms {
+            margin: 100px 0 15px 0;
+        }
+
+            .terms > div {
+                min-height: 70px;
+            }
+
+        .payment-info {
+            color: #707070;
+            font-size: 12px;
+        }
+
+            .payment-info div {
+                display: inline-block;
+                min-width: 10px;
+            }
+
+        .ib_drop_zone {
+            color: #F8ED31 !important;
+            border-color: #F8ED31 !important;
+        }
+
+        .remarks table {
+            border-collapse: collapse;
+        }
+        .ql-align-center {
+            text-align: center;
+        }
+
+        .ql-align-center img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .ql-align-right {
+            text-align: right;
+        }
+
+        .ql-align-right img {
+            display: block;
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        .ql-align-justify {
+            text-align: justify;
+        }
+        .remarks td {
+            border: 1px solid rgb(0,0,0);
+            padding: 6px 24px;
+            height: 12px
+        }
+
+        .remarks p {
+            overflow-wrap: break-word;
+        }
+
+        .remarks * {
+            margin-top: 12px;
+        }
+
+        .remarks img {
+            display: block;
+        }
+
+        .remarks blockquote {
+            font-size: 1.4em;
+            width: 60%;
+            margin: 50px auto;
+            font-family: Open Sans;
+            font-style: italic;
+            color: #555555;
+            padding: 1.2em 30px 1.2em 75px;
+            border-left: 8px solid #78C0A8;
+            line-height: 1.6;
+            position: relative;
+            background: #EDEDED;
+        }
+
+            .remarks blockquote cite :before {
+                content: '- ';
+                display: block;
+                color: #333333;
+                font-size: 1em;
+                font-weight: 400;
+                margin-top: 1em;
+            }
+
+            .remarks blockquote cite {
+                display: block;
+                color: #333333;
+                font-size: 9px;
+                font-weight: 400;
+                margin-top: 1em;
+            }
+
+        .checkboxes input {
+            width: 1.3em;
+            height: 1.3em;
+            background-color: white;
+            border-radius: 50%;
+            vertical-align: middle;
+            border: 1px solid #ddd;
+        }
+
+        .checkboxes label {
+            margin-left: 20px;
+        }
+
+        img {
+            width: 30%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="invoice-top">
+            <section class="memo">
+
+                <div class="company-info">
+                    <span class="company-name">Dino Store</span>
+
+                    <span class="spacer"></span>
+
+                    <div>30000 Bedrock | Cobblestone County</div>
+                    <div>227 Cobblestone Road |</div>
+
+
+                    <span class="clearfix"></span>
+
+                    <div>| +555 7 789-1234</div>
+                    <div>http://dinostore.bed | hello@dinostore.bed</div>
+                </div>
+
+            </section>
+            <section class="invoice-info">
+                <div>
+                    <span>Issue Date:</span>
+                </div>
+
+                <div>
+                    <span>{{date}}</span>
+                </div>
+
+                <span class="clearfix"></span>
+
+                <section class="invoice-title-number">
+
+                    <span class="title">INVOICE</span>
+                    <span class="number">#{{no}}</span>
+
+                </section>
+            </section>
+
+            <section class="client-info">
+                <span>Bill to:</span>
+                <div>
+                    <span class="bold">{{customer_name}}</span>
+                </div>
+            </section>
+            <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="invoice-body">
+            <section class="items">
+
+                <table class="print-table" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th></th>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Rate(Rs.)</th>
+                        <th>Amount(Rs.)</th>
+                    </tr>
+                    {% for item in items %}
+                    <tr data-iterate="item">
+                        <td>{{forloop.counter}}.</td>
+                        <td>{{item.name}}-{{item.no}}</td>
+                        <td>{{item.quantity}}</td>
+                        <td>{{item.rate}}</td>
+                        <td>{{item.amount}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+            </section>
+
+            <section class="sums">
+
+                <table cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th>Items</th>
+                        <td>{{total_items}}</td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <th>Quantity</th>
+                        <td>{{total_quantity}}</td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <th>Grand Total</th>
+                        <td>Rs. {{total_amount}}</td>
+                        <td></td>
+                    </tr>
+
+                </table>
+
+            </section>
+
+            <div class="clearfix"></div>
+            <br /><br />
+            {% if isRemarks %}
+            <div class="remarks-with-title">
+                <div><h3>Remarks: </h3></div>
+                <br /><hr />
+                <div class="remarks">
+                    {% autoescape off %}{{ remarks }}{% endautoescape %}
+                </div><hr /><br />
+            </div>
+            {% endif %}
+            <section class="terms">
+
+                <span class="hidden">terms_label</span>
+                <div>
+                    Thank you very much. We really appreciate your business.
+                    <br />Please send payments before the due date.
+                </div>
+
+            </section>
+
+            <div class="payment-info">
+                <div>You can send payments at: ACC:123006705 | IBAN:US100000060345 | SWIFT:BOA447</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
