@@ -14,7 +14,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import { itemRatePattern, base_url } from '../components/credentials.js';
 import MessageAlert from './messageAlert';
-import * as actions from '../store/actions/auth';
 
 const ItemSaveDialog = (props) => {
     const [messageAlert, setMessageAlert] = useState(false);
@@ -153,15 +152,5 @@ const ItemSaveDialog = (props) => {
         </div>
     );
 }
-const mapStateToProps = (state) => {
-    return {
-        token: state.token,
-        loading: state.loading,
-        error: state.error,
-        user: state.user,
-        set: state.itemSet
-    }
-}
 
-
-export default connect(mapStateToProps, null)(ItemSaveDialog);
+export default ItemSaveDialog;

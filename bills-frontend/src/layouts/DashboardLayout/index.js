@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
-import { connect } from 'react-redux';
 import { SnackbarProvider, useSnackbar } from 'notistack';
-import Fab from '@material-ui/core/Fab';
-import MicOffIcon from '@material-ui/icons/MicOff';
-import MicIcon from '@material-ui/icons/Mic';
 
 import NavBar from './NavBar';
 import TopBar from './TopBar';
@@ -17,7 +13,6 @@ import DashboardView from '../../views/reports/DashboardView';
 
 import LogoutAlert from '../../alerts/logout';
 import { shortcut } from '../../components/shortcuts.js';
-import * as actions from '../../store/actions/auth';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -48,53 +43,10 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-const mic = new SpeechRecognition();
-
-mic.continuous = true
-mic.interimResults = true
-mic.lang = 'en-IN'
-
 const DashboardLayout = (props) => {
     const classes = useStyles();
     const history = useHistory();
-    const [isListening, setIsListening] = useState(false);
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
-
-    useEffect(() => {
-        console.log(document.activeElement.tagName);
-    }, [document.activeElement.tagName]);
-
-    useEffect(() => {
-        if (isListening) {
-            mic.start();
-            mic.onend = () => {
-                mic.start();
-            }
-        } else {
-            mic.stop();
-            mic.onend = () => {
-                console.log('Stopped mic on click');
-            }
-        }
-        mic.onstart = () => {
-            console.log('Mic is on');
-        }
-        mic.onresult = event => {
-            const transcript = Array.from(event.results)
-                .map(result => result[0])
-                .map(result => result.transcript)
-                .join('')
-            if (document.activeElement.tagName === 'INPUT') {
-                console.log(props);
-                props.updateItemSet(props.itemSet.openFilters, props.itemSet.filterRateMin, props.itemSet.filterRateMax, props.itemSet.filterStartDate, props.itemSet.filterEndDate, transcript, props.itemSet.order, props.itemSet.orderBy, props.itemSet.page, props.itemSet.rowsPerPage);
-                console.log(transcript)
-            }
-            mic.onerror = event => {
-                console.error(event.error)
-            }
-        }
-    }, [isListening]);
 
     useEffect(() => {
         shortcut.add("F1", () => history.push('/bills'));
@@ -146,49 +98,11 @@ const DashboardLayout = (props) => {
                         </div>
                     </div>
                 </div>
-                <Fab
-                    onTouchStart={(event) => {
-                        event.preventDefault();
-                        setIsListening(true);
-                    }}
-                    onTouchEnd={(event) => {
-                        event.preventDefault();
-                        setIsListening(false);
-                    }}
-                    onMouseDown={(event) => {
-                        event.preventDefault();
-                        setIsListening(true);
-                    }}
-                    onMouseUp={(event) => {
-                        event.preventDefault();
-                        setIsListening(false);
-                    }}
-                    onMouseLeave={(event) => {
-                        event.preventDefault();
-                        setIsListening(false);
-                    }}
-                    color={isListening ? 'red' : 'primary'} aria-label="add" style={{ position: 'absolute', zIndex: 1000, bottom: '5%', right: '5%' }}>
-                    {isListening ? <MicIcon /> : <MicOffIcon />}
-                </Fab>
-                
-                
+
             </div>
         </SnackbarProvider>
   );
 };
 
-const mapStateToProps = (state) => {
-    return {
-        loading: state.loading,
-        error: state.error,
-        itemSet: state.itemSet,
-        user: state.user
-    }
-}
-const mapDispatchToProps = dispatch => {
-    return {
-        updateItemSet: (openFilters, filterRateMin, filterRateMax, filterStartDate, filterEndDate, searchQuery, order, orderBy, page, rowsPerPage) => dispatch(actions.updateItemSet(openFilters, filterRateMin, filterRateMax, filterStartDate, filterEndDate, searchQuery, order, orderBy, page, rowsPerPage))
-    }
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(DashboardLayout);
+export default DashboardLayout;

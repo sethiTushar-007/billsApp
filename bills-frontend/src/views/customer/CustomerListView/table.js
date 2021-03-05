@@ -25,6 +25,9 @@ import {
     SvgIcon,
 } from '@material-ui/core';
 import Table from '@material-ui/core/Table';
+import Fab from '@material-ui/core/Fab';
+import MicOffIcon from '@material-ui/icons/MicOff';
+import MicIcon from '@material-ui/icons/Mic';
 import TableBody from '@material-ui/core/TableBody';
 import Collapse from '@material-ui/core/Collapse';
 import Box from '@material-ui/core/Box';
@@ -51,6 +54,7 @@ import getInitials from '../../../utils/getInitials';
 import SendEmailToCustomer from '../../../alerts/sendEmailToCustomer';
 import { shortcut } from '../../../components/shortcuts.js';
 import MessageAlert from '../../../alerts/messageAlert';
+import mic from '../../../components/credentials.js';
 
 const headCells = [
     { id: 'avatar', align: 'center', numeric: false, disablePadding: false, label: '' },
@@ -170,6 +174,7 @@ const EnhancedTableToolbar = (props) => {
                 {openFilters ?
                     <Tooltip title="Clear Filters" onClick={() => {
                         handleOpenFilters();
+                        console.log(null);
                         setFilterStartDate(null);
                         setFilterEndDate(null);
                     }
@@ -196,7 +201,7 @@ const EnhancedTableToolbar = (props) => {
                         <span style={{ fontWeight: 500, fontFamily: 'roboto' }}>Date</span>
                         <MuiPickersUtilsProvider utils={DateFnsUtils}>
                             <KeyboardDatePicker
-                                style={{ marginLeft: 10, maxWidth: 400 }}
+                                style={{ marginLeft: 10, width: 200 }}
                                 value={filterStartDate}
                                 inputVariant="outlined"
                                 format="dd MMM, yyyy"
@@ -204,14 +209,14 @@ const EnhancedTableToolbar = (props) => {
                                 label="From"
                             />
                             <KeyboardDatePicker
-                                style={{ marginLeft: 10, maxWidth: 400}}
+                                style={{ marginLeft: 10, width: 200 }}
                                 value={filterEndDate}
                                 inputVariant="outlined"
                                 format="dd MMM, yyyy"
                                 onChange={setFilterEndDate}
                                 label="To"
                             />
-                        </MuiPickersUtilsProvider>
+                            </MuiPickersUtilsProvider>
                     </div>
                     </Box>
                 </PerfectScrollbar>
@@ -261,6 +266,8 @@ const useStyles2 = makeStyles((theme) => ({
 const CustomersTable = (props) => {
     const classes1 = useStyles1();
     const classes2 = useStyles2();
+
+    const [isListening, setIsListening] = useState(false);
 
     const [exportMenu, setExportMenu] = useState(null);
 
@@ -379,8 +386,8 @@ const CustomersTable = (props) => {
 
     useEffect(() => {
         setOpenFilters(props.customerSet.openFilters);
-        setFilterStartDate(props.customerSet.filterStartDate || '');
-        setFilterEndDate(props.customerSet.filterEndDate || '');
+        setFilterStartDate(props.customerSet.filterStartDate || null);
+        setFilterEndDate(props.customerSet.filterEndDate || null);
         setSearchQuery(props.customerSet.searchQuery || "");
         setOrder(props.customerSet.order || 'desc');
         setOrderBy(props.customerSet.orderBy || 'date');
@@ -391,6 +398,33 @@ const CustomersTable = (props) => {
     useEffect(() => {
         props.updateCustomerSet(openFilters, filterStartDate, filterEndDate, searchQuery, order, orderBy, page, rowsPerPage);
     }, [openFilters, searchQuery, order, orderBy, page, filterStartDate, filterEndDate, rowsPerPage]);
+
+    useEffect(() => {
+        if (isListening) {
+            mic.start();
+            mic.onend = () => {
+                mic.start();
+            }
+        } else {
+            mic.stop();
+            mic.onend = () => {
+                console.log('Mic is off');
+            }
+        }
+        mic.onstart = () => {
+            console.log('Mic is on');
+        }
+        mic.onresult = event => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0])
+                .map(result => result.transcript)
+                .join('')
+            setSearchQuery(transcript);
+            mic.onerror = event => {
+                console.error(event.error)
+            }
+        }
+    }, [isListening]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -529,7 +563,7 @@ const CustomersTable = (props) => {
     }
 
     return (
-        <div style={{ height: '100%'}}>
+        <div style={{ height: '100%' }}>
             {messageInAlert &&
                 <ConfirmationAlert open={openConfirmAlert} handleClose={() => handleConfirmAlert()} handleSubmit={selected.length===0 ? handleDeleteSingleItem : handleDeleteItem} message={messageInAlert} />
             }
@@ -563,8 +597,8 @@ const CustomersTable = (props) => {
             </Box>
             <Box mt={3}>
                 <Card>
-                    <CardContent>
-                        <Box maxWidth={500}>
+                    <CardContent style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Box width='60%'>
                             <TextField
                                 fullWidth
                                 value={searchQuery}
@@ -579,13 +613,48 @@ const CustomersTable = (props) => {
                                                 <SearchIcon />
                                             </SvgIcon>
                                         </InputAdornment>
+                                    ),
+                                    endAdornment: (
+                                        searchQuery &&
+                                        <InputAdornment position="start" style={{ cursor: 'pointer' }} onClick={() => setSearchQuery('')}>
+                                            <SvgIcon
+                                                fontSize="small"
+                                                color="action"
+                                            >
+                                                <ClearIcon />
+                                            </SvgIcon>
+                                        </InputAdornment>
                                     )
                                 }}
                                 placeholder="Search customer by name or email id or phone"
                                 variant="outlined"
                             />
                         </Box>
-
+                        <Fab
+                            size='small'
+                            onTouchStart={(event) => {
+                                event.preventDefault();
+                                setIsListening(true);
+                            }}
+                            onTouchEnd={(event) => {
+                                event.preventDefault();
+                                setIsListening(false);
+                            }}
+                            onMouseDown={(event) => {
+                                event.preventDefault();
+                                setIsListening(true);
+                            }}
+                            onMouseUp={(event) => {
+                                event.preventDefault();
+                                setIsListening(false);
+                            }}
+                            onMouseLeave={(event) => {
+                                event.preventDefault();
+                                setIsListening(false);
+                            }}
+                            color={isListening ? 'red' : 'primary'} aria-label="speak">
+                            {isListening ? <MicIcon /> : <MicOffIcon />}
+                        </Fab>
                     </CardContent>
                 </Card>
             </Box>

@@ -15,6 +15,9 @@ import Box from '@material-ui/core/Box';
 import dateformat from 'dateformat';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
+import Fab from '@material-ui/core/Fab';
+import MicOffIcon from '@material-ui/icons/MicOff';
+import MicIcon from '@material-ui/icons/Mic';
 import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker
@@ -56,6 +59,7 @@ import * as actions from '../../../store/actions/auth';
 import { base_url, iconsSize } from '../../../components/credentials.js';
 import PrintPage from '../../../alerts/NewBill/Print/print';
 import MessageAlert from '../../../alerts/messageAlert';
+import mic from '../../../components/credentials.js';
 
 const headCells = [
     { id: 'id', align: 'left', numeric: false, disablePadding: true, label: 'ID' },
@@ -247,6 +251,7 @@ const EnhancedTableToolbar = (props) => {
                                 label="To"
                             />
                         </MuiPickersUtilsProvider>
+                               
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                             <span style={{ fontWeight: 500, fontFamily: 'roboto' }}>Amount</span>
@@ -321,6 +326,8 @@ const BillsTable = (props) => {
     const history = useHistory();
     const classes1 = useStyles1();
     const classes2 = useStyles2();
+
+    const [isListening, setIsListening] = useState(false);
 
     const [messageAlert, setMessageAlert] = useState(false);
     const [exportMenu, setExportMenu] = useState(null);
@@ -506,6 +513,33 @@ const BillsTable = (props) => {
     useEffect(() => {
         updateRows();
     }, [searchQuery, order, orderBy, page, filterAmountMin, filterAmountMax, filterProducts, filterStartDate, filterEndDate, rowsPerPage]);
+
+    useEffect(() => {
+        if (isListening) {
+            mic.start();
+            mic.onend = () => {
+                mic.start();
+            }
+        } else {
+            mic.stop();
+            mic.onend = () => {
+                console.log('Stopped mic on click');
+            }
+        }
+        mic.onstart = () => {
+            console.log('Mic is on');
+        }
+        mic.onresult = event => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0])
+                .map(result => result.transcript)
+                .join('')
+            setSearchQuery(transcript);
+            mic.onerror = event => {
+                console.error(event.error)
+            }
+        }
+    }, [isListening]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -734,8 +768,8 @@ const BillsTable = (props) => {
             </Box>
             <Box mt={3}>
                 <Card>
-                    <CardContent>
-                        <Box maxWidth={500}>
+                    <CardContent style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                        <Box width='60%'>
                             <TextField
                                 fullWidth
                                 value={searchQuery}
@@ -750,13 +784,47 @@ const BillsTable = (props) => {
                                                 <SearchIcon />
                                             </SvgIcon>
                                         </InputAdornment>
+                                    ), endAdornment: (
+                                        searchQuery &&
+                                        <InputAdornment position="start" style={{ cursor: 'pointer' }} onClick={() => setSearchQuery('')}>
+                                            <SvgIcon
+                                                fontSize="small"
+                                                color="action"
+                                            >
+                                                <ClearIcon />
+                                            </SvgIcon>
+                                        </InputAdornment>
                                     )
                                 }}
                                 placeholder="Search bill by name or id"
                                 variant="outlined"
                             />
                         </Box>
-
+                        <Fab
+                            size='small'
+                            onTouchStart={(event) => {
+                                event.preventDefault();
+                                setIsListening(true);
+                            }}
+                            onTouchEnd={(event) => {
+                                event.preventDefault();
+                                setIsListening(false);
+                            }}
+                            onMouseDown={(event) => {
+                                event.preventDefault();
+                                setIsListening(true);
+                            }}
+                            onMouseUp={(event) => {
+                                event.preventDefault();
+                                setIsListening(false);
+                            }}
+                            onMouseLeave={(event) => {
+                                event.preventDefault();
+                                setIsListening(false);
+                            }}
+                            color={isListening ? 'red' : 'primary'} aria-label="speak">
+                            {isListening ? <MicIcon /> : <MicOffIcon />}
+                        </Fab>
                     </CardContent>
                 </Card>
             </Box>

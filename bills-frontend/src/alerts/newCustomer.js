@@ -83,9 +83,9 @@ const NewCustomerDialog = (props) => {
                     if (response.status == 201) {
                         setFile(null);
                         setSrc(null);
-                        props.updateData();
                         setMessageAlert(false);
                         props.handleMessageSnackbar('Customer saved!', 'success');
+                        props.updateData();
                     }
                 })
 
@@ -109,9 +109,9 @@ const NewCustomerDialog = (props) => {
             if (response.status==201) {
                 setFile(null);
                 setSrc(null);
-                props.updateData();
                 setMessageAlert(false);
                 props.handleMessageSnackbar('Customer saved!', 'success');
+                props.updateData();
             }
         }
     }
@@ -124,7 +124,10 @@ const NewCustomerDialog = (props) => {
             storage.ref('/images/customer-avatars/' + date_string).put(file)
                 .then(async snapshot => {
                     const downloadURL = await storage.ref("images/customer-avatars/").child(date_string).getDownloadURL();
-                    let response = axios.patch(base_url + '/api/customer-update/' + id,
+                    if (avatar) {
+                        storage.refFromURL(avatar).delete();
+                    }
+                    let response = await axios.patch(base_url + '/api/customer-update/' + id,
                         {
                             user: props.user['pk'],
                             name: name,
@@ -139,12 +142,9 @@ const NewCustomerDialog = (props) => {
                                 'Authorization': ' Token ' + props.token
                             }
                         });
-                    if (response.status == 200) {
+                    if (response.status==200) {
                         setFile(null);
                         setSrc(null);
-                        if (avatar) {
-                            storage.refFromURL(avatar).delete();
-                        }
                         setMessageAlert(false);
                         props.updateData();
                         props.handleMessageSnackbar('Customer updated!', 'success');

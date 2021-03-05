@@ -37,6 +37,16 @@ export const iconsSize = 20;
 export const allowedExtensionsForFile = /(\.jpg|\.jpeg|\.png|\.gif|\.xlsx|\.xls|\.doc|\.docx|\.ppt|\.pptx|\.txt|\.pdf)$/i; 
 export const allowedExtensionsForImage = /(\.jpg|\.jpeg|\.png)$/i; 
 
+/* Speech Rocognition object */
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const mic = new SpeechRecognition();
+
+mic.continuous = true
+mic.interimResults = true
+mic.lang = 'en-IN'
+
+export default mic;
+
 export const cleanQuillText = async (text) => {
     let text1 = await text.replaceAll("<br>", "<br/>");
     let text2 = await text1.replace("<div class=\"ql-editor\" data-gramm=\"false\" contenteditable=\"true\">", "");
@@ -48,5 +58,3 @@ export const cleanQuillText = async (text) => {
     }
     return "<p></p>";
 }
-
-export default storage;

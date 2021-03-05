@@ -22,6 +22,9 @@ import {
     Search as SearchIcon, Edit2 as EditIcon, Copy as DuplicateIcon, Trash2 as DeleteIcon, Filter as FilterIcon, X as ClearIcon, 
 } from 'react-feather';
 import Menu from '@material-ui/core/Menu';
+import Fab from '@material-ui/core/Fab';
+import MicOffIcon from '@material-ui/icons/MicOff';
+import MicIcon from '@material-ui/icons/Mic';
 import MenuItem from '@material-ui/core/MenuItem';
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -48,6 +51,7 @@ import * as actions from '../../../store/actions/auth';
 import './styles.css';
 import { shortcut } from '../../../components/shortcuts.js';
 import MessageAlert from '../../../alerts/messageAlert';
+import mic from '../../../components/credentials.js';
 
 const headCells = [
     { id: 'no', align: 'left', numeric: false, disablePadding: true, label: 'ID' },
@@ -210,7 +214,7 @@ const EnhancedTableToolbar = (props) => {
                         <span style={{ fontWeight: 500, fontFamily: 'roboto' }}>Date</span>
                         <MuiPickersUtilsProvider utils={DateFnsUtils}>
                             <KeyboardDatePicker
-                                style={{ marginLeft: 10, minWidth: 200 }}
+                                style={{ marginLeft: 10, width: 200 }}
                                 value={filterStartDate}
                                 inputVariant="outlined"
                                 format="dd MMM, yyyy"
@@ -218,7 +222,7 @@ const EnhancedTableToolbar = (props) => {
                                 label="From"
                             />
                             <KeyboardDatePicker
-                                style={{ marginLeft: 10, minWidth: 200 }}
+                                style={{ marginLeft: 10, width: 200 }}
                                 value={filterEndDate}
                                 inputVariant="outlined"
                                 format="dd MMM, yyyy"
@@ -272,6 +276,8 @@ const useStyles2 = makeStyles((theme) => ({
 const ItemsTable = (props) => {
     const classes1 = useStyles1();
     const classes2 = useStyles2();
+
+    const [isListening, setIsListening] = useState(false);
 
     const [messageAlert, setMessageAlert] = useState(false);
     const [exportMenu, setExportMenu] = useState(null);
@@ -411,8 +417,8 @@ const ItemsTable = (props) => {
         setOpenFilters(props.itemSet.openFilters);
         setFilterRateMin(props.itemSet.filterRateMin || '');
         setFilterRateMax(props.itemSet.filterRateMax || '');
-        setFilterStartDate(props.itemSet.filterStartDate || '');
-        setFilterEndDate(props.itemSet.filterEndDate || '');
+        setFilterStartDate(props.itemSet.filterStartDate || null);
+        setFilterEndDate(props.itemSet.filterEndDate || null);
         setSearchQuery(props.itemSet.searchQuery || "");
         setOrder(props.itemSet.order || 'desc');
         setOrderBy(props.itemSet.orderBy || 'date');
@@ -423,6 +429,33 @@ const ItemsTable = (props) => {
     useEffect(() => {
         props.updateItemSet(openFilters, filterRateMin, filterRateMax, filterStartDate, filterEndDate, searchQuery, order, orderBy, page, rowsPerPage);
     }, [openFilters, searchQuery, order, orderBy, page, filterRateMin, filterRateMax, filterStartDate, filterEndDate, rowsPerPage]);
+
+    useEffect(() => {
+        if (isListening) {
+            mic.start();
+            mic.onend = () => {
+                mic.start();
+            }
+        } else {
+            mic.stop();
+            mic.onend = () => {
+                console.log('Stopped mic on click');
+            }
+        }
+        mic.onstart = () => {
+            console.log('Mic is on');
+        }
+        mic.onresult = event => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0])
+                .map(result => result.transcript)
+                .join('')
+            setSearchQuery(transcript);
+            mic.onerror = event => {
+                console.error(event.error)
+            }
+        }
+    }, [isListening]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -600,8 +633,8 @@ const ItemsTable = (props) => {
             </Box>
             <Box mt={3}>
                 <Card>
-                    <CardContent>
-                        <Box maxWidth={500}>
+                    <CardContent style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Box width='60%'>
                             <TextField
                                 id='searchQuery_products'
                                 fullWidth
@@ -617,12 +650,47 @@ const ItemsTable = (props) => {
                                                 <SearchIcon />
                                             </SvgIcon>
                                         </InputAdornment>
+                                    ), endAdornment: (
+                                        searchQuery &&
+                                        <InputAdornment position="start" style={{ cursor: 'pointer' }} onClick={() => setSearchQuery('')}>
+                                            <SvgIcon
+                                                fontSize="small"
+                                                color="action"
+                                            >
+                                                <ClearIcon />
+                                            </SvgIcon>
+                                        </InputAdornment>
                                     )
                                 }}
                                 placeholder="Search product by name or id"
                                 variant="outlined"
                             />
                         </Box>
+                        <Fab
+                            size='small'
+                            onTouchStart={(event) => {
+                                event.preventDefault();
+                                setIsListening(true);
+                            }}
+                            onTouchEnd={(event) => {
+                                event.preventDefault();
+                                setIsListening(false);
+                            }}
+                            onMouseDown={(event) => {
+                                event.preventDefault();
+                                setIsListening(true);
+                            }}
+                            onMouseUp={(event) => {
+                                event.preventDefault();
+                                setIsListening(false);
+                            }}
+                            onMouseLeave={(event) => {
+                                event.preventDefault();
+                                setIsListening(false);
+                            }}
+                            color={isListening ? 'red' : 'primary'} aria-label="speak">
+                            {isListening ? <MicIcon /> : <MicOffIcon />}
+                        </Fab>
 
                     </CardContent>
                 </Card>

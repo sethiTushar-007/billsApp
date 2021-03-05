@@ -7,7 +7,6 @@ import DashboardLayout from './layouts/DashboardLayout';
 import MainLayout from './layouts/MainLayout';
 import { ThemeProvider } from '@material-ui/core';
 import GlobalStyles from './components/GlobalStyles';
-import './mixins/chartjs';
 import theme from './theme';
 import * as actions from './store/actions/auth';
 import { base_url } from './components/credentials';
