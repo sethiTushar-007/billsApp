@@ -47,9 +47,9 @@ import { base_url, iconsSize } from '../../../components/credentials.js';
 import * as actions from '../../../store/actions/auth';
 import './styles.css';
 import NewCustomerDialog from '../../../alerts/newCustomer';
-import UpdateCustomerDialog from '../../../alerts/updateCustomer';
 import getInitials from '../../../utils/getInitials';
 import SendEmailToCustomer from '../../../alerts/sendEmailToCustomer';
+import { shortcut } from '../../../components/shortcuts.js';
 import MessageAlert from '../../../alerts/messageAlert';
 
 const headCells = [
@@ -267,17 +267,27 @@ const CustomersTable = (props) => {
     const [messageAlert, setMessageAlert] = useState(false);
 
     const [openNewCustomerDialog, setOpenNewCustomerDialog] = useState(false);
-    const [openUpdateCustomerDialog, setOpenUpdateCustomerDialog] = useState(false);
     const [customerToUpdate, setCustomerToUpdate] = useState(null);
     const handleNewCustomerOpen = () => {
-        setOpenNewCustomerDialog(!openNewCustomerDialog);
-    }
-    const handleUpdateCustomerOpen = () => {
-        if (openUpdateCustomerDialog) {
+        if (openNewCustomerDialog) {
             setCustomerToUpdate(null);
         }
-        setOpenUpdateCustomerDialog(!openUpdateCustomerDialog);
+        setOpenNewCustomerDialog(!openNewCustomerDialog);
     }
+
+    useEffect(() => {
+        shortcut.add("F12", () => {
+            setOpenNewCustomerDialog(prev => {
+                if (prev) {
+                    setCustomerToUpdate(null);
+                }
+                return !prev;
+            });
+        });
+        return () => {
+            shortcut.remove("F12");
+        }
+    }, []);
 
     const [openSendMailToCustomer, setOpenSendMailToCustomer] = useState(false);
     const [mailTo, setMailTo] = useState(null);
@@ -327,7 +337,7 @@ const CustomersTable = (props) => {
 
     const manageUpdate = (item) => {
         setCustomerToUpdate(item);
-        handleUpdateCustomerOpen();
+        handleNewCustomerOpen();
     }
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -523,8 +533,7 @@ const CustomersTable = (props) => {
             {messageInAlert &&
                 <ConfirmationAlert open={openConfirmAlert} handleClose={() => handleConfirmAlert()} handleSubmit={selected.length===0 ? handleDeleteSingleItem : handleDeleteItem} message={messageInAlert} />
             }
-            <NewCustomerDialog updateData={updateRows} open={openNewCustomerDialog} handleClose={handleNewCustomerOpen} handleMessageSnackbar={props.handleMessageSnackbar} />
-            {customerToUpdate && <UpdateCustomerDialog updateData={updateRows} open={openUpdateCustomerDialog} handleClose={handleUpdateCustomerOpen} handleMessageSnackbar={props.handleMessageSnackbar} customerToUpdate={customerToUpdate} />}
+            {openNewCustomerDialog && <NewCustomerDialog updateData={updateRows} open={openNewCustomerDialog} handleClose={handleNewCustomerOpen} handleMessageSnackbar={props.handleMessageSnackbar} customerToUpdate={customerToUpdate} />}
             <SendEmailToCustomer open={openSendMailToCustomer} handleClose={handleSendMailToCustomerOpen} mailTo={mailTo} handleMessageSnackbar={props.handleMessageSnackbar} />
             <MessageAlert open={messageAlert} handleClose={() => setMessageAlert(false)} message={'Exporting...'} />
             <Box
@@ -547,7 +556,7 @@ const CustomersTable = (props) => {
                 <Button
                     color="primary"
                     variant="contained"
-                    onClick={() => handleNewCustomerOpen()}
+                    onClick={handleNewCustomerOpen}
                 >
                     Add Customer
         </Button>

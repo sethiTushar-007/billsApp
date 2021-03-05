@@ -46,6 +46,7 @@ import ItemSaveDialog from '../../../alerts/newItem';
 import { base_url, iconsSize } from '../../../components/credentials.js';
 import * as actions from '../../../store/actions/auth';
 import './styles.css';
+import { shortcut } from '../../../components/shortcuts.js';
 import MessageAlert from '../../../alerts/messageAlert';
 
 const headCells = [
@@ -283,6 +284,19 @@ const ItemsTable = (props) => {
         }
         setOpenSaveItemDialog(!openSaveItemDialog);
     }
+    useEffect(() => {
+        shortcut.add("F12", () => {
+            setOpenSaveItemDialog(prev => {
+                if (prev) {
+                    setItemToUpdate(null);
+                }
+                return !prev;
+            });
+        });
+        return () => {
+            shortcut.remove("F12");
+        }
+    }, []);
 
     const [openFilters, setOpenFilters] = useState(false);
 
@@ -589,6 +603,7 @@ const ItemsTable = (props) => {
                     <CardContent>
                         <Box maxWidth={500}>
                             <TextField
+                                id='searchQuery_products'
                                 fullWidth
                                 value={searchQuery}
                                 onChange={event => setSearchQuery(event.target.value)}

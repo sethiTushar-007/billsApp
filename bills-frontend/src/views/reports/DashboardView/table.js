@@ -342,6 +342,28 @@ const BillsTable = (props) => {
         }
         setOpenNewBillDialog(!openNewBillDialog);
     }
+    useEffect(() => {
+        shortcut.add("F12", () => {
+            setOpenNewBillDialog(prev => {
+                if (prev) {
+                    axios.get(base_url + '/api/document-delete/', {
+                        params: {
+                            'userid': props.user.avatar_no
+                        },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': ' Token ' + token
+                        }
+                    });
+                    setBillToUpdate(null);
+                }
+                return !prev;
+            });
+        });
+        return () => {
+            shortcut.remove("F12");
+        }
+    }, []);
 
     const [openSendBillToCustomer, setOpenSendBillToCustomer] = useState(false);
     const [mailTo, setMailTo] = useState(null);

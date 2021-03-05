@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
+import { connect } from 'react-redux';
 import { SnackbarProvider, useSnackbar } from 'notistack';
 import Fab from '@material-ui/core/Fab';
 import MicOffIcon from '@material-ui/icons/MicOff';
@@ -16,6 +17,7 @@ import DashboardView from '../../views/reports/DashboardView';
 
 import LogoutAlert from '../../alerts/logout';
 import { shortcut } from '../../components/shortcuts.js';
+import * as actions from '../../store/actions/auth';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -60,6 +62,10 @@ const DashboardLayout = (props) => {
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
 
     useEffect(() => {
+        console.log(document.activeElement.tagName);
+    }, [document.activeElement.tagName]);
+
+    useEffect(() => {
         if (isListening) {
             mic.start();
             mic.onend = () => {
@@ -79,7 +85,11 @@ const DashboardLayout = (props) => {
                 .map(result => result[0])
                 .map(result => result.transcript)
                 .join('')
-            console.log(transcript)
+            if (document.activeElement.tagName === 'INPUT') {
+                console.log(props);
+                props.updateItemSet(props.itemSet.openFilters, props.itemSet.filterRateMin, props.itemSet.filterRateMax, props.itemSet.filterStartDate, props.itemSet.filterEndDate, transcript, props.itemSet.order, props.itemSet.orderBy, props.itemSet.page, props.itemSet.rowsPerPage);
+                console.log(transcript)
+            }
             mic.onerror = event => {
                 console.error(event.error)
             }
@@ -157,12 +167,28 @@ const DashboardLayout = (props) => {
                         event.preventDefault();
                         setIsListening(false);
                     }}
-                    color={isListening ? 'red' : 'primary'} aria-label="add" style={{ position: 'absolute', zIndex: 100, bottom: '5%', right: '5%' }}>
+                    color={isListening ? 'red' : 'primary'} aria-label="add" style={{ position: 'absolute', zIndex: 1000, bottom: '5%', right: '5%' }}>
                     {isListening ? <MicIcon /> : <MicOffIcon />}
                 </Fab>
+                
+                
             </div>
         </SnackbarProvider>
   );
 };
 
-export default DashboardLayout;
+const mapStateToProps = (state) => {
+    return {
+        loading: state.loading,
+        error: state.error,
+        itemSet: state.itemSet,
+        user: state.user
+    }
+}
+const mapDispatchToProps = dispatch => {
+    return {
+        updateItemSet: (openFilters, filterRateMin, filterRateMax, filterStartDate, filterEndDate, searchQuery, order, orderBy, page, rowsPerPage) => dispatch(actions.updateItemSet(openFilters, filterRateMin, filterRateMax, filterStartDate, filterEndDate, searchQuery, order, orderBy, page, rowsPerPage))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DashboardLayout);
