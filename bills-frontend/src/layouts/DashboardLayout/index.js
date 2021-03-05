@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
 import { SnackbarProvider, useSnackbar } from 'notistack';
+import Fab from '@material-ui/core/Fab';
+import MicOffIcon from '@material-ui/icons/MicOff';
+import MicIcon from '@material-ui/icons/Mic';
 
 import NavBar from './NavBar';
 import TopBar from './TopBar';
@@ -15,7 +18,7 @@ import LogoutAlert from '../../alerts/logout';
 import { shortcut } from '../../components/shortcuts.js';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
+    root: {
     backgroundColor: theme.palette.background.dark,
     display: 'flex',
     height: '100%',
@@ -43,10 +46,45 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const mic = new SpeechRecognition();
+
+mic.continuous = true
+mic.interimResults = true
+mic.lang = 'en-IN'
+
 const DashboardLayout = (props) => {
     const classes = useStyles();
     const history = useHistory();
+    const [isListening, setIsListening] = useState(false);
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
+
+    useEffect(() => {
+        if (isListening) {
+            mic.start();
+            mic.onend = () => {
+                mic.start();
+            }
+        } else {
+            mic.stop();
+            mic.onend = () => {
+                console.log('Stopped mic on click');
+            }
+        }
+        mic.onstart = () => {
+            console.log('Mic is on');
+        }
+        mic.onresult = event => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0])
+                .map(result => result.transcript)
+                .join('')
+            console.log(transcript)
+            mic.onerror = event => {
+                console.error(event.error)
+            }
+        }
+    }, [isListening]);
 
     useEffect(() => {
         shortcut.add("F1", () => history.push('/bills'));
@@ -79,7 +117,7 @@ const DashboardLayout = (props) => {
 
     return (
         <SnackbarProvider maxSnack={3}>
-            <div className={classes.root}>
+            <div className={classes.root} style={{position: 'relative'}}>
                 <LogoutAlert logoutAlertOpen={logoutAlertOpen} logoutDialog={logoutDialog} />
                 
                 <TopBar onMobileNavOpen={() => setMobileNavOpen(true)} logoutDialog={logoutDialog} />
@@ -90,14 +128,38 @@ const DashboardLayout = (props) => {
                 />
                 <div className={classes.wrapper}>
                     <div className={classes.contentContainer}>
-                            <div className={classes.content}>
+                        <div className={classes.content}>
                             {props.page === 'account' && <AccountView handleMessageSnackbar={handleMessageSnackbar} handleMessageSnackbar={handleMessageSnackbar} />}
                             {props.page === 'customers' && <CustomerListView handleMessageSnackbar={handleMessageSnackbar} />}
                             {props.page === 'bills' && <DashboardView handleMessageSnackbar={handleMessageSnackbar} handleMessageSnackbar={handleMessageSnackbar}/>}
                             {props.page === 'products' && <ProductListView handleMessageSnackbar={handleMessageSnackbar} />}
-                            </div>
+                        </div>
                     </div>
                 </div>
+                <Fab
+                    onTouchStart={(event) => {
+                        event.preventDefault();
+                        setIsListening(true);
+                    }}
+                    onTouchEnd={(event) => {
+                        event.preventDefault();
+                        setIsListening(false);
+                    }}
+                    onMouseDown={(event) => {
+                        event.preventDefault();
+                        setIsListening(true);
+                    }}
+                    onMouseUp={(event) => {
+                        event.preventDefault();
+                        setIsListening(false);
+                    }}
+                    onMouseLeave={(event) => {
+                        event.preventDefault();
+                        setIsListening(false);
+                    }}
+                    color={isListening ? 'red' : 'primary'} aria-label="add" style={{ position: 'absolute', zIndex: 100, bottom: '5%', right: '5%' }}>
+                    {isListening ? <MicIcon /> : <MicOffIcon />}
+                </Fab>
             </div>
         </SnackbarProvider>
   );
