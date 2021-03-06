@@ -153,4 +153,13 @@ const ItemSaveDialog = (props) => {
     );
 }
 
-export default ItemSaveDialog;
+const mapStateToProps = (state) => {
+    return {
+        token: state.token,
+        loading: state.loading,
+        error: state.error,
+        user: state.user
+    }
+}
+
+export default connect(mapStateToProps, null)(ItemSaveDialog);

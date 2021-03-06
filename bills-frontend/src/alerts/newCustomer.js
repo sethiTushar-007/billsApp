@@ -33,7 +33,7 @@ const NewCustomerDialog = (props) => {
             setSrc(null);
             setAvatar(null);
         }
-    }, []);
+    }, [props.customerToUpdate]);
 
     const uploadAvatar = () => {
         const input = document.createElement('input');
@@ -154,31 +154,31 @@ const NewCustomerDialog = (props) => {
             if (!src) {
                 if (avatar) {
                     storage.refFromURL(avatar).delete();
-                } else {
-                    let response = await axios.patch(base_url + '/api/customer-update/' + id,
-                        {
-                            user: props.user['pk'],
-                            name: name,
-                            date: new Date(),
-                            avatar: null,
-                            email: email,
-                            phone: phone
-                        },
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': ' Token ' + props.token
-                            }
+                } 
+                let response = await axios.patch(base_url + '/api/customer-update/' + id,
+                    {
+                        user: props.user['pk'],
+                        name: name,
+                        date: new Date(),
+                        avatar: null,
+                        email: email,
+                        phone: phone
+                    },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': ' Token ' + props.token
                         }
-                    )
-                    if (response.status == 200) {
-                        setFile(null);
-                        setSrc(null);
-                        props.updateData();
-                        setMessageAlert(false);
-                        props.handleMessageSnackbar('Customer updated!', 'success');
                     }
+                )
+                if (response.status == 200) {
+                    setFile(null);
+                    setSrc(null);
+                    props.updateData();
+                    setMessageAlert(false);
+                    props.handleMessageSnackbar('Customer updated!', 'success');
                 }
+                
             } else {
                 let response = await axios.patch(base_url + '/api/customer-update/' + id,
                     {

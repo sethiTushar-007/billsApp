@@ -567,7 +567,7 @@ const CustomersTable = (props) => {
             {messageInAlert &&
                 <ConfirmationAlert open={openConfirmAlert} handleClose={() => handleConfirmAlert()} handleSubmit={selected.length===0 ? handleDeleteSingleItem : handleDeleteItem} message={messageInAlert} />
             }
-            {openNewCustomerDialog && <NewCustomerDialog updateData={updateRows} open={openNewCustomerDialog} handleClose={handleNewCustomerOpen} handleMessageSnackbar={props.handleMessageSnackbar} customerToUpdate={customerToUpdate} />}
+            <NewCustomerDialog updateData={updateRows} open={openNewCustomerDialog} handleClose={handleNewCustomerOpen} handleMessageSnackbar={props.handleMessageSnackbar} customerToUpdate={customerToUpdate} />
             <SendEmailToCustomer open={openSendMailToCustomer} handleClose={handleSendMailToCustomerOpen} mailTo={mailTo} handleMessageSnackbar={props.handleMessageSnackbar} />
             <MessageAlert open={messageAlert} handleClose={() => setMessageAlert(false)} message={'Exporting...'} />
             <Box
@@ -705,6 +705,15 @@ const CustomersTable = (props) => {
                                                 <Avatar
                                                     className={classes1.avatar}
                                                     src={row.avatar}
+                                                    style={{ cursor: row.avatar && 'pointer' }}
+                                                    onClick={() => {
+                                                        if (row.avatar) {
+                                                            const a = document.createElement('a');
+                                                            a.setAttribute('href', row.avatar);
+                                                            a.setAttribute('target', '_blank');
+                                                            a.click();
+                                                        }
+                                                    }}
                                                 >
                                                     {getInitials(row.name)}
                                                 </Avatar>
@@ -720,7 +729,7 @@ const CustomersTable = (props) => {
                                             <TableCell align="left" padding='none'>{row.email}</TableCell>
                                             <TableCell align="left" padding= 'none'>{row.phone}</TableCell>
                                             <TableCell align="right" padding='none'>{dateformat(row.date, "dd mmm, yyyy - hh:MM:ss TT")}</TableCell>
-                                            <TableCell align="right" style={{ padding: 0, width: 150 }}>
+                                            <TableCell align="right" style={{ padding: 0, width: 150}}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
                                                     <div className="tableEdit">
                                                         <Tooltip title="Edit" onClick={() => manageUpdate(item)}>
