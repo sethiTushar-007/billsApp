@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import clsx from 'clsx';
@@ -16,6 +16,7 @@ import {
 } from '@material-ui/core';
 import * as actions from '../../../store/actions/auth';
 import { default_avatar, base_url, storage, allowedExtensionsForImage } from '../../../components/credentials';
+import MessageAlert from '../../../alerts/messageAlert';
 
 const useStyles = makeStyles(() => ({
   root: {},
@@ -28,6 +29,8 @@ const useStyles = makeStyles(() => ({
 const Profile = (props) => {
     const classes = useStyles();
 
+    const [messageAlert, setMessageAlert] = useState(false);
+
     const handleUploadPicture = () => {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
@@ -38,7 +41,7 @@ const Profile = (props) => {
             if (!allowedExtensionsForImage.exec(file.name)) {
                 props.handleMessageSnackbar("Invalid file !", "error");
             } else {
-                props.handleMessageSnackbar('Uploading...');
+                setMessageAlert(true);
                 const date_string = new Date().getTime().toString() + '.jpeg';
                 try {
                     storage.ref('/images/user-avatars/' + date_string).put(file)
@@ -56,6 +59,7 @@ const Profile = (props) => {
                                 }
                             );
                             if (response.status == 200) {
+                                setMessageAlert(false);
                                 props.handleMessageSnackbar('Picture uploaded!', 'success');
                                 if (props.user.avatar) {
                                     let old_url = props.user.avatar;
@@ -65,6 +69,7 @@ const Profile = (props) => {
                             }
                         })
                 } catch (error) {
+                    setMessageAlert(false);
                     props.handleMessageSnackbar('Uploading failed!', 'error');
                 }
             }
@@ -93,7 +98,8 @@ const Profile = (props) => {
     <Card
       className={clsx(classes.root, props.className)}
       {...props}
-    >
+      >
+      <MessageAlert open={messageAlert} handleClose={() => setMessageAlert(false)} message={'Uploading...'} />
       <CardContent>
         <Box
           alignItems="center"
