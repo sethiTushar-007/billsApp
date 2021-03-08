@@ -13,6 +13,10 @@ import {
   Typography,
   makeStyles
 } from '@material-ui/core';
+
+import GoogleLogin from 'react-google-login';
+import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
+
 import FacebookIcon from '../../icons/Facebook';
 import GoogleIcon from '../../icons/Google';
 import * as actions from '../../store/actions/auth';
@@ -28,7 +32,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const LoginView = (props) => {
-  const classes = useStyles();
+    const classes = useStyles();
+
+    const responseGoogle = (response) => {
+        console.log(response);
+    }
+
+    const responseFacebook = (response) => {
+        console.log(response);
+    }
+
   return (
     <Page
       className={classes.root}
@@ -90,32 +103,50 @@ const LoginView = (props) => {
                     item
                     xs={12}
                     md={6}
-                  >
-                    <Button
-                      color="primary"
-                      fullWidth
-                      startIcon={<FacebookIcon />}
-                      onClick={handleSubmit}
-                      size="large"
-                      variant="contained"
-                    >
-                      Login with Facebook
-                    </Button>
+                    >              
+
+                    <FacebookLogin
+                        appId="482438449783753"
+                        callback={responseFacebook}
+                        onFailure={() => props.handleMessageSnackbar('Login Failed!', 'error')}
+                        render={renderProps => (
+                            <Button
+                                color="primary"
+                                fullWidth
+                                startIcon={<FacebookIcon />}
+                                onClick={renderProps.onClick}
+                                size="large"
+                                variant="contained"
+                            >
+                                Login with Facebook
+                            </Button>
+                        )}
+                    />
+                        
+                    
                   </Grid>
                   <Grid
                     item
                     xs={12}
                     md={6}
-                  >
-                    <Button
-                      fullWidth
-                      startIcon={<GoogleIcon />}
-                      onClick={handleSubmit}
-                      size="large"
-                      variant="contained"
                     >
-                      Login with Google
-                    </Button>
+                    <GoogleLogin
+                        clientId="315793660470-dainbj6n4qfaci4tc1pcio7dqctlnr7g.apps.googleusercontent.com"
+                        render={renderProps => (
+                            <Button
+                                fullWidth
+                                startIcon={<GoogleIcon />}
+                                onClick={renderProps.onClick}
+                                size="large"
+                                variant="contained"
+                            >
+                                Login with Google
+                            </Button>
+                        )}
+                        onSuccess={responseGoogle}
+                        onFailure={() => props.handleMessageSnackbar('Login Failed!', 'error')}
+                    />
+                    
                   </Grid>
                 </Grid>
                 <Box
