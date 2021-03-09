@@ -15,7 +15,7 @@ const LogoutAlert = (props) => {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">{"Are you sure you want to logout ?"}</DialogTitle>
+                <DialogTitle id="alert-dialog-title"><span style={{ fontSize: 17 }}>Are you sure you want to logout ?</span></DialogTitle>
                 <DialogActions>
                     <Button onClick={props.logoutDialog} color="primary">
                         NO
