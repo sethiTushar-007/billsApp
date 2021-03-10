@@ -4,6 +4,11 @@ import 'firebase/storage'
 /* Base URL for APIs */
 export const base_url = 'http://127.0.0.1:8000';
 
+/* Google Client ID */
+export const google_client_id = '315793660470-dainbj6n4qfaci4tc1pcio7dqctlnr7g.apps.googleusercontent.com';
+
+/* Facebook Client ID */
+export const facebook_client_id = '482438449783753';
 
 const firebaseConfig = {
     apiKey: "AIzaSyAkA9ynjz_t0uw_wIzicmgtQxqWY6pz0X4",

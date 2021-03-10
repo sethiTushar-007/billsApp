@@ -21,6 +21,7 @@ import FacebookIcon from '../../icons/Facebook';
 import GoogleIcon from '../../icons/Google';
 import * as actions from '../../store/actions/auth';
 import Page from '../../components/Page';
+import { google_client_id, facebook_client_id } from '../../components/credentials.js';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -106,7 +107,7 @@ const LoginView = (props) => {
                     >              
 
                     <FacebookLogin
-                        appId="482438449783753"
+                        appId={facebook_client_id}
                         callback={responseFacebook}
                         onFailure={() => props.handleMessageSnackbar('Login Failed!', 'error')}
                         render={renderProps => (
@@ -131,7 +132,7 @@ const LoginView = (props) => {
                     md={6}
                     >
                     <GoogleLogin
-                        clientId="315793660470-dainbj6n4qfaci4tc1pcio7dqctlnr7g.apps.googleusercontent.com"
+                        clientId={google_client_id}
                         render={renderProps => (
                             <Button
                                 fullWidth
