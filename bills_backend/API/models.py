@@ -8,7 +8,7 @@ from jsonfield import JSONField
 class UserInfo(models.Model):
     user = models.ForeignKey(User, related_name="user", on_delete=models.CASCADE)
     no = models.CharField(max_length=100, default=None, null=True)
-    avatar = models.CharField(max_length=255, default=None, null=True, blank=True)
+    avatar = models.CharField(max_length=1024, default=None, null=True, blank=True)
     email = models.EmailField(max_length=255, default=None, null=True, blank=True)
     password = models.CharField(max_length=50, default=None, null=True, blank=True)
     subject = models.CharField(max_length=500, default="Bill", null=True, blank=True)

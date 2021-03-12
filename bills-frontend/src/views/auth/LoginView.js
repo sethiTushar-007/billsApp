@@ -36,13 +36,11 @@ const LoginView = (props) => {
     const classes = useStyles();
 
     const responseGoogle = (response) => {
-        console.log(response);
-        //props.onSocialAuth('google', response.accessToken, response.idToken, response.profileObj.imageUrl, props.handleMessageSnackbar);
+        props.onSocialAuth('google', response.accessToken, response.idToken, response.profileObj.imageUrl, props.handleMessageSnackbar);
     }
 
     const responseFacebook = (response) => {
-        console.log(response);
-        //props.onSocialAuth('facebook', response.accessToken, response.signedRequest, null, props.handleMessageSnackbar);
+        props.onSocialAuth('facebook', response.accessToken, response.signedRequest, response.picture.data.url, props.handleMessageSnackbar);
     }
 
   return (
@@ -111,6 +109,7 @@ const LoginView = (props) => {
                     <FacebookLogin
                         appId={facebook_client_id}
                         callback={responseFacebook}
+                        fields='email, name, picture'
                         onFailure={() => props.handleMessageSnackbar('Login Failed!', 'error')}
                         render={renderProps => (
                             <Button
