@@ -37,10 +37,12 @@ const LoginView = (props) => {
 
     const responseGoogle = (response) => {
         console.log(response);
+        //props.onSocialAuth('google', response.accessToken, response.idToken, response.profileObj.imageUrl, props.handleMessageSnackbar);
     }
 
     const responseFacebook = (response) => {
         console.log(response);
+        //props.onSocialAuth('facebook', response.accessToken, response.signedRequest, null, props.handleMessageSnackbar);
     }
 
   return (
@@ -234,7 +236,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        onAuth: (username, password, handleMessageSnackbar) => dispatch(actions.authLogin(username, password, handleMessageSnackbar))
+        onAuth: (username, password, handleMessageSnackbar) => dispatch(actions.authLogin(username, password, handleMessageSnackbar)),
+        onSocialAuth: (provider, accessToken, idToken, profilePic, handleMessageSnackbar) => dispatch(actions.authSocialLogin(provider, accessToken, idToken, profilePic, handleMessageSnackbar))
     }
 }
 

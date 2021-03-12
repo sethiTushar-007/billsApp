@@ -2,6 +2,10 @@ from django.shortcuts import render
 from django.db.models import Q
 import json
 import smtplib
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+from dj_rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from django.core.files import File
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -70,6 +74,18 @@ class CustomerRangeFilter(FilterSet):
         model=Customer
         fields=['user', 'date']
 # Create your views here.
+
+class GoogleLogin(SocialLoginView):
+    authentication_classes = []
+    adapter_class = GoogleOAuth2Adapter
+    callback_url = "http://localhost:3000"
+    client_class = OAuth2Client
+
+class FacebookLogin(SocialLoginView):
+    authentication_classes = []
+    adapter_class = FacebookOAuth2Adapter
+    callback_url = "http://localhost:3000"
+    client_class = OAuth2Client
 
 class UpdatePasswordView(APIView):
     permission_classes = [IsAuthenticated]

@@ -49,6 +49,11 @@ INSTALLED_APPS = [
     'rest_auth',
     'corsheaders',
 
+    'dj_rest_auth',
+
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
+
     'API',
 ]
 
@@ -72,7 +77,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
-ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
 
 ROOT_URLCONF = 'bills_backend.urls'
 
@@ -95,7 +100,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bills_backend.wsgi.application'
 
-SITE_ID=1
+SITE_ID=2
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

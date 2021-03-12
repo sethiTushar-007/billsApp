@@ -62,6 +62,76 @@ export const authLogin = (username, password, handleMessageSnackbar) => {
     }
 }
 
+export const authSocialLogin = (provider, accessToken, idToken, profilePic, handleMessageSnackbar) => {
+    return async dispatch => {
+        try {
+            dispatch(authStart());
+            let response = await axios.post(`${base_url}/social-login/${provider}/`, {
+                access_token: accessToken,
+                id_token: idToken
+            });
+            let token = await response.data.key;
+            const response1 = await fetch(base_url + "/rest-auth/user/",
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': ' Token ' + token,
+                    }
+                });
+            const data1 = await response1.json();
+
+            const response2 = await fetch(base_url + "/api/userinfo-get/?user=" + data1['pk'],
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': ' Token ' + token,
+                    }
+                });
+            const data2 = await response2.json();
+            if (data2.length > 0) {
+                let response3 = await axios.patch(base_url + '/api/userinfo-update/' + data2[0]['id'],
+                    {
+                        avatar: profilePic
+                    },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': ' Token ' + token
+                        }
+                    }
+                );
+            } else {
+                let response4 = await fetch(base_url + '/api/userinfo-create/', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        user: data1['pk'],
+                        no: new Date().getTime().toString(),
+                        avatar: profilePic,
+                        email: null
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': ' Token ' + token
+                    }
+                })
+            }
+            
+            const expirationDate = new Date(new Date().getTime() + 3600 * 1000);
+            localStorage.setItem('token', token);
+            localStorage.setItem('expirationDate', expirationDate);
+            dispatch(authSuccess(token));
+            dispatch(checkAuthTimeout(3600));
+            handleMessageSnackbar('Login success !', 'success', '/bills');
+
+        } catch (error) {
+            console.error(error);
+            handleMessageSnackbar('Login failed !', 'error');
+        }
+    }
+}
+
 export const authSignup = (username, email, password1, password2, avatar, handleMessageSnackbar) => {
     return async dispatch => {
         var token = null;

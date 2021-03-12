@@ -63,7 +63,7 @@ const Profile = (props) => {
                                 props.handleMessageSnackbar('Picture uploaded!', 'success');
                                 if (props.user.avatar) {
                                     let old_url = props.user.avatar;
-                                    storage.refFromURL(old_url).delete();
+                                    old_url.includes('https://firebasestorage.googleapis.com/') && storage.refFromURL(old_url).delete();
                                 }
                                 props.addUser({ ...props.user, avatar: downloadURL.toString() });
                             }
@@ -89,7 +89,7 @@ const Profile = (props) => {
             }
         );
         if (response.status == 200) {
-            storage.refFromURL(old_url).delete();
+            old_url.includes('https://firebasestorage.googleapis.com/') && storage.refFromURL(old_url).delete();
             props.addUser({ ...props.user, avatar: null });
         }
     }

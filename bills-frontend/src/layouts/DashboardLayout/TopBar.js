@@ -9,6 +9,7 @@ import {
   Hidden,
   IconButton,
   Toolbar,
+  Tooltip,
   makeStyles
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -37,10 +38,13 @@ const TopBar = (props) => {
           <Logo />
         </RouterLink>
         <Box flexGrow={1} />
+        
         <Hidden mdDown>
-            <IconButton color="inherit" onClick={props.logoutDialog}>
-            <InputIcon />
-          </IconButton>
+            <Tooltip title="Logout">
+                <IconButton color="inherit" onClick={props.logoutDialog}>
+                    <InputIcon />
+                </IconButton>
+            </Tooltip>
         </Hidden>
         <Hidden lgUp>
           <IconButton
