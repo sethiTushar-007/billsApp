@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.db.models import Q
+from rest_framework.authtoken.models import Token
+from django.template.loader import render_to_string
 import json
 import smtplib
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -87,6 +89,42 @@ class FacebookLogin(SocialLoginView):
     callback_url = "http://localhost:3000"
     client_class = OAuth2Client
 
+class EmailConfirmationView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        username = request.data['username']
+        user = User.objects.get(username=username)
+        email = user.email
+        user.is_active = False
+        user.save()
+        token = Token.objects.get(user = user)
+        
+        mail_subject = 'Email Verification'
+        message = render_to_string('verify_email.html',{'username':username,'domain':'localhost:3000','token':token})
+        from_email = settings.EMAIL_HOST_USER
+        to_email = [email]
+        send_mail(mail_subject,message,from_email,to_email,fail_silently=True)
+
+        return Response(status=status.HTTP_200_OK)
+
+class CheckEmailConfirmationView(APIView):
+    permission_classes = []
+    def post(self, request):
+        username = request.data['username']
+        key = request.data['key']
+        try:
+            user = User.objects.get(username=username)
+            token = Token.objects.get(user = user)
+            if str(token)==str(key):
+                user.is_active = True
+                user.save()
+                token.delete()
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+       
 class UpdatePasswordView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
@@ -150,11 +188,6 @@ class ItemUpdateView(generics.RetrieveUpdateDestroyAPIView):
 class ItemDeleteView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-
-        user = User.objects.get(email='sethitushar2000@gmail.com')
-        user.is_active = False
-        user.save()
-
         Item.objects.all().delete()
         return Response(status=status.HTTP_200_OK)
     def post(self, request):

@@ -23,6 +23,12 @@ export const authFail = (error) => {
 }
 
 export const logout = () => {
+    axios.post(base_url + '/rest-auth/logout/', {}, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': ' Token ' + localStorage.getItem('token')
+        }
+    });
     localStorage.clear();
     addUser(null);
     return {
@@ -143,7 +149,7 @@ export const authSignup = (username, email, password1, password2, avatar, handle
         }).catch(error => {
             handleMessageSnackbar((error.response.data['username'] && error.response.data['username'][0]) || (error.response.data['email'] && error.response.data['email'][0]) || (error.response.data['non_field_errors'] && error.response.data['non_field_errors'][0]) || 'Error!', 'error');
         })
-        if (response1) {
+        if (response1.status==201) {
             token = await response1.data.key;
             if (token) {
                 let response2 = await fetch(base_url + '/rest-auth/user/',
@@ -169,7 +175,17 @@ export const authSignup = (username, email, password1, password2, avatar, handle
                     }
                 })
                 if (response3.ok) {
-                    handleMessageSnackbar('Registration Successful!', 'success', '/login');
+                    let response4 = await axios.post(base_url + '/api/send-email-confirmation/', {
+                        username: username,
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': ' Token ' + token
+                        }
+                    });
+                    if (response4.status == 200) {
+                        handleMessageSnackbar('Email verification link sent !', 'success', '/login');
+                    }
                 }
             }
         }
