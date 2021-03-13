@@ -23,6 +23,12 @@ export const authFail = (error) => {
 }
 
 export const logout = () => {
+    axios.post(base_url + '/rest-auth/logout/', {}, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': ' Token ' + localStorage.getItem('token')
+        }
+    });
     localStorage.clear();
     addUser(null);
     return {
