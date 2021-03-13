@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.db.models import Q
 from rest_framework.authtoken.models import Token
-from django.template.loader import render_to_string
 import json
 import smtplib
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -29,7 +28,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from . models import *
 from django.contrib.sites.shortcuts import get_current_site
 from io import BytesIO
-from django.template.loader import get_template
+from django.template.loader import get_template, render_to_string
 from xhtml2pdf import pisa
 from rest_framework import filters
 from rest_framework.pagination import PageNumberPagination
@@ -99,11 +98,21 @@ class EmailConfirmationView(APIView):
         user.save()
         token = Token.objects.get(user = user)
         
-        mail_subject = 'Email Verification'
-        message = render_to_string('verify_email.html',{'username':username,'domain':'localhost:3000','token':token})
+        mail_subject = 'BillsApp - Email Verification'
         from_email = settings.EMAIL_HOST_USER
         to_email = [email]
-        send_mail(mail_subject,message,from_email,to_email,fail_silently=True)
+
+        url = "http://localhost:3000/account/verify/?user="+username+"&key="+str(token)
+        message = get_template('verify_email.html').render({'username':username,'url':url})
+        
+        msg = EmailMessage(
+            mail_subject,
+            message,
+            from_email,
+            to_email,
+        )
+        msg.content_subtype = "html"
+        msg.send()
 
         return Response(status=status.HTTP_200_OK)
 
