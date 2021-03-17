@@ -46,12 +46,10 @@ const Password = (props) => {
                         'Content-Type': 'application/json',
                         'Authorization': ' Token ' + props.token
                     }
-                }).catch(error => console.log(error.response.error));
-            if (response.status == 200) {
+                }).catch(error => props.handleMessageSnackbar(error.response.data.error[0],'error'));
+            if (response && response.status == 200) {
                 props.handleMessageSnackbar('Password updated!', 'success');
                 props.logout();
-            } else {
-                props.handleMessageSnackbar('Passwords do not match!', 'error');
             }
         } else {
             props.handleMessageSnackbar('Passwords do not match!', 'error');

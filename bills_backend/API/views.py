@@ -99,7 +99,7 @@ class UpdatePasswordView(APIView):
             user.save()
             return Response(status=status.HTTP_200_OK)
         except exceptions.ValidationError as e:
-            return Response({'data':e.messages}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response({'error':e.messages}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserInfoCreateView(generics.CreateAPIView): 
     permission_classes = [IsAuthenticated]
