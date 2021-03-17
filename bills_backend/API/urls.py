@@ -5,6 +5,8 @@ urlpatterns = [
     path('password-update/', UpdatePasswordView.as_view()),
     path('send-email-confirmation/', EmailConfirmationView.as_view()),
     path('verify-email/', CheckEmailConfirmationView.as_view()),
+    path('send-password-reset-email/', PasswordResetEmailView.as_view()),
+    path('reset-password-check/', PasswordResetCheckView.as_view()),
     path('userinfo-create/', UserInfoCreateView.as_view()),
     path('userinfo-get/', UserInfoGetView.as_view()),
     path('userinfo-update/<int:pk>', UserInfoUpdateView.as_view()),

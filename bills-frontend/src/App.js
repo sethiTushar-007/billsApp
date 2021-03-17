@@ -64,6 +64,7 @@ const App = (props) => {
                   <Route exact path="/login" render={() => (!authenticated ? < MainLayout page='login' /> : <Redirect to='/' />)} />
                   <Route exact path="/register" render={() => (!authenticated ? < MainLayout page='register' /> : <Redirect to='/' />)} />
                   <Route exact path="/account/verify" render={() => (!authenticated ? < MainLayout page='email-verify' /> : <Redirect to='/' />)} />
+                  <Route exact path="/password-reset" render={() => (!authenticated ? < MainLayout page='password-reset' /> : <Redirect to='/' />)} />
                   <Route exact path="/*" render={() => <MainLayout page='error' />} />
               </Switch>
               </Router>

@@ -133,7 +133,56 @@ class CheckEmailConfirmationView(APIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
-       
+
+class PasswordResetEmailView(APIView):
+    permission_classes = []
+    def post(self, request):
+        email = request.data['email']
+        try:
+            user = User.objects.get(email=email)
+        except :
+            return Response({'error': 'Email ID not registered.'}, status=status.HTTP_404_NOT_FOUND)
+        if user.is_active :
+            username = user.username
+            token = Token.objects.get_or_create(user = user)[0]
+        else:
+            return Response({'error': 'Email ID not verified yet.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        mail_subject = 'BillsApp - Reset Password'
+        from_email = settings.EMAIL_HOST_USER
+        to_email = [email]
+
+        url = "http://localhost:3000/password-reset/?user="+username+"&key="+str(token)
+        message = get_template('password_reset.html').render({'username':username,'url':url})
+        
+        msg = EmailMessage(
+            mail_subject,
+            message,
+            from_email,
+            to_email,
+        )
+        msg.content_subtype = "html"
+        msg.send()
+
+        return Response(status=status.HTTP_200_OK)
+
+class PasswordResetCheckView(APIView):
+    permission_classes = []
+    def post(self, request):
+        username = request.data['username']
+        key = request.data['key']
+        try:
+            user = User.objects.get(username=username)
+            token = Token.objects.get(user = user)
+            if str(token)==str(key):
+                token.delete()
+                new_token = Token.objects.get_or_create(user = user)[0]
+                return Response({'key': str(new_token), 'uid': user.id}, status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 class UpdatePasswordView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):

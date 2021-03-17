@@ -11,8 +11,6 @@ const EmailVerifyPage = (props) => {
 
     useEffect(async () => {
         let query = queryString.parse(location.search);
-        console.log(query.user);
-        console.log(query.key);
         let response = await axios.post(base_url + '/api/verify-email/', {
             'username': query.user,
             'key': query.key
@@ -21,9 +19,6 @@ const EmailVerifyPage = (props) => {
                 'Content-Type': 'application/json',
             }
         }).catch(error => console.log(error));
-        console.log(response);
-        console.log('Tushar');
-        console.log(response);
         if (response && response.status == 200) {
             props.handleMessageSnackbar('Email verified. Now login with your account.', 'success', '/login')
         } else {
