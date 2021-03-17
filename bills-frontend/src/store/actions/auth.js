@@ -23,10 +23,11 @@ export const authFail = (error) => {
 }
 
 export const logout = () => {
+    let tok = localStorage.getItem('token');
     axios.post(base_url + '/rest-auth/logout/', {}, {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': ' Token ' + localStorage.getItem('token')
+            'Authorization': ' Token ' + tok
         }
     });
     localStorage.clear();
@@ -62,8 +63,7 @@ export const authLogin = (username, password, handleMessageSnackbar) => {
             handleMessageSnackbar('Login success !', 'success', '/bills');
 
         } catch (error) {
-            console.error(error);
-            handleMessageSnackbar('Login failed !', 'error');
+            handleMessageSnackbar((error.response.data['username'] && error.response.data['username'][0]) || (error.response.data['non_field_errors'] && error.response.data['non_field_errors'][0]) || 'Error!', 'error');
         }
     }
 }
@@ -147,7 +147,7 @@ export const authSignup = (username, email, password1, password2, avatar, handle
             password1: password1,
             password2: password2,
         }).catch(error => {
-            handleMessageSnackbar((error.response.data['username'] && error.response.data['username'][0]) || (error.response.data['email'] && error.response.data['email'][0]) || (error.response.data['non_field_errors'] && error.response.data['non_field_errors'][0]) || 'Error!', 'error');
+            handleMessageSnackbar((error.response.data['username'] && error.response.data['username'][0]) || (error.response.data['email'] && error.response.data['email'][0]) || (error.response.data['non_field_errors'] && error.response.data['non_field_errors'][0]) || (error.response.data['password1'] && error.response.data['password1'][0]) || 'Error!', 'error');
         })
         if (response1) {
             token = await response1.data.key;

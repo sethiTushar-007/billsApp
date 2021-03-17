@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.db.models import Q
+import django.contrib.auth.password_validation as validators
+from django.core import exceptions
 import json
 import smtplib
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -90,10 +92,14 @@ class FacebookLogin(SocialLoginView):
 class UpdatePasswordView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
-        user = User.objects.get(id=request.data['uid'])
-        user.set_password(request.data['password'])
-        user.save()
-        return Response(status=status.HTTP_200_OK)
+        try:
+            validators.validate_password(password=request.data['password'])
+            user = User.objects.get(id=request.data['uid'])
+            user.set_password(request.data['password'])
+            user.save()
+            return Response(status=status.HTTP_200_OK)
+        except exceptions.ValidationError as e:
+            return Response({'data':e.messages}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 class UserInfoCreateView(generics.CreateAPIView): 
     permission_classes = [IsAuthenticated]
