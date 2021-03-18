@@ -2,22 +2,22 @@ import firebase from 'firebase/app'
 import 'firebase/storage'
 
 /* Base URL for APIs */
-export const base_url = 'http://127.0.0.1:8000';
+export const base_url = process.env.BACKEND_URL;
 
 /* Google Client ID */
-export const google_client_id = '315793660470-dainbj6n4qfaci4tc1pcio7dqctlnr7g.apps.googleusercontent.com';
+export const google_client_id = process.env.GOOGLE_CLIENT_ID;
 
 /* Facebook Client ID */
-export const facebook_client_id = '482438449783753';
+export const facebook_client_id = process.env.FACEBOOK_CLIENT_ID;
 
 /* Firebase Configurations */
 const firebaseConfig = {
-    apiKey: "AIzaSyAkA9ynjz_t0uw_wIzicmgtQxqWY6pz0X4",
-    authDomain: "firstreactapp-f0586.firebaseapp.com",
-    projectId: "firstreactapp-f0586",
-    storageBucket: "firstreactapp-f0586.appspot.com",
-    messagingSenderId: "64161067812",
-    appId: "1:64161067812:web:66c11f6a812cd07ef939b1"
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: `${process.env.FIREBASE_PROJECT_ID}.firebaseapp.com`,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.FIREBASE_APP_ID
 };
 
 firebase.initializeApp(firebaseConfig);
