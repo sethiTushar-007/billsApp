@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.db.models import Q
 import django.contrib.auth.password_validation as validators
 from django.core import exceptions
+from rest_framework.authtoken.models import Token
 import json
 import smtplib
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -29,7 +30,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from . models import *
 from django.contrib.sites.shortcuts import get_current_site
 from io import BytesIO
-from django.template.loader import get_template
+from django.template.loader import get_template, render_to_string
 from xhtml2pdf import pisa
 from rest_framework import filters
 from rest_framework.pagination import PageNumberPagination
@@ -88,6 +89,101 @@ class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
     callback_url = "http://localhost:3000"
     client_class = OAuth2Client
+
+class EmailConfirmationView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        username = request.data['username']
+        user = User.objects.get(username=username)
+        email = user.email
+        user.is_active = False
+        user.save()
+        token = Token.objects.get(user = user)
+        
+        mail_subject = 'BillsApp - Email Verification'
+        from_email = settings.EMAIL_HOST_USER
+        to_email = [email]
+
+        url = "http://localhost:3000/account/verify/?user="+username+"&key="+str(token)
+        message = get_template('verify_email.html').render({'username':username,'url':url})
+        
+        msg = EmailMessage(
+            mail_subject,
+            message,
+            from_email,
+            to_email,
+        )
+        msg.content_subtype = "html"
+        msg.send()
+
+        return Response(status=status.HTTP_200_OK)
+
+class CheckEmailConfirmationView(APIView):
+    permission_classes = []
+    def post(self, request):
+        username = request.data['username']
+        key = request.data['key']
+        try:
+            user = User.objects.get(username=username)
+            token = Token.objects.get(user = user)
+            if str(token)==str(key):
+                user.is_active = True
+                user.save()
+                token.delete()
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class PasswordResetEmailView(APIView):
+    permission_classes = []
+    def post(self, request):
+        email = request.data['email']
+        try:
+            user = User.objects.get(email=email)
+        except :
+            return Response({'error': 'Email ID not registered.'}, status=status.HTTP_404_NOT_FOUND)
+        if user.is_active :
+            username = user.username
+            token = Token.objects.get_or_create(user = user)[0]
+        else:
+            return Response({'error': 'Email ID not verified yet.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        mail_subject = 'BillsApp - Reset Password'
+        from_email = settings.EMAIL_HOST_USER
+        to_email = [email]
+
+        url = "http://localhost:3000/password-reset/?user="+username+"&key="+str(token)
+        message = get_template('password_reset.html').render({'username':username,'url':url})
+        
+        msg = EmailMessage(
+            mail_subject,
+            message,
+            from_email,
+            to_email,
+        )
+        msg.content_subtype = "html"
+        msg.send()
+
+        return Response(status=status.HTTP_200_OK)
+
+class PasswordResetCheckView(APIView):
+    permission_classes = []
+    def post(self, request):
+        username = request.data['username']
+        key = request.data['key']
+        try:
+            user = User.objects.get(username=username)
+            token = Token.objects.get(user = user)
+            if str(token)==str(key):
+                token.delete()
+                new_token = Token.objects.get_or_create(user = user)[0]
+                return Response({'key': str(new_token), 'uid': user.id}, status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 class UpdatePasswordView(APIView):
     permission_classes = [IsAuthenticated]

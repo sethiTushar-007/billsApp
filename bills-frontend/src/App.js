@@ -11,6 +11,7 @@ import theme from './theme';
 import * as actions from './store/actions/auth';
 import { base_url } from './components/credentials';
 import LoadingPage from './components/loading';
+import EmailVerifyPage from './components/emailVerify';
 
 const App = (props) => {
     const [authenticated, setAuthenticated] = useState();
@@ -62,6 +63,8 @@ const App = (props) => {
                   <Route exact path="/products" render={() => (authenticated ? (props.user ? <DashboardLayout page='products' /> : <LoadingPage />) : <Redirect to='/login' />)} />
                   <Route exact path="/login" render={() => (!authenticated ? < MainLayout page='login' /> : <Redirect to='/' />)} />
                   <Route exact path="/register" render={() => (!authenticated ? < MainLayout page='register' /> : <Redirect to='/' />)} />
+                  <Route exact path="/account/verify" render={() => (!authenticated ? < MainLayout page='email-verify' /> : <Redirect to='/' />)} />
+                  <Route exact path="/password-reset" render={() => (!authenticated ? < MainLayout page='password-reset' /> : <Redirect to='/' />)} />
                   <Route exact path="/*" render={() => <MainLayout page='error' />} />
               </Switch>
               </Router>

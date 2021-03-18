@@ -6,6 +6,8 @@ import { SnackbarProvider, useSnackbar } from 'notistack';
 import LoginView from '../../views/auth/LoginView';
 import NotFoundView from '../../views/errors/NotFoundView';
 import RegisterView from '../../views/auth/RegisterView';
+import EmailVerifyPage from '../../components/emailVerify';
+import PasswordResetPage from '../../components/passwordReset';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,6 +62,8 @@ const MainLayout = (props) => {
                     {props.page === 'login' && <LoginView handleMessageSnackbar={handleMessageSnackbar} />}
                     {props.page === 'register' && <RegisterView handleMessageSnackbar={handleMessageSnackbar}/>}
                     {props.page === 'error' && <NotFoundView />}
+                    {props.page === 'email-verify' && <EmailVerifyPage handleMessageSnackbar={handleMessageSnackbar} />}
+                    {props.page === 'password-reset' && <PasswordResetPage handleMessageSnackbar={handleMessageSnackbar} />}
                   </div>
                 </div>
               </div>

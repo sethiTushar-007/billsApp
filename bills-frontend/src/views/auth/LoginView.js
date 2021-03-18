@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -22,6 +22,7 @@ import GoogleIcon from '../../icons/Google';
 import * as actions from '../../store/actions/auth';
 import Page from '../../components/Page';
 import { google_client_id, facebook_client_id } from '../../components/credentials.js';
+import EmailForgotPass from '../../alerts/email_forgotPass.js';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
 
 const LoginView = (props) => {
     const classes = useStyles();
+    const [openEmailForgotPass, setOpenEmailForgotPass] = useState(false);
 
     const responseGoogle = (response) => {
         props.onSocialAuth('google', response.accessToken, response.idToken, response.profileObj.imageUrl, props.handleMessageSnackbar);
@@ -47,7 +49,8 @@ const LoginView = (props) => {
     <Page
       className={classes.root}
       title="Login"
-    >
+      >
+          <EmailForgotPass open={openEmailForgotPass} handleClose={() => setOpenEmailForgotPass(false)} handleMessageSnackbar={props.handleMessageSnackbar} />
       <Box
         display="flex"
         flexDirection="column"
@@ -203,6 +206,7 @@ const LoginView = (props) => {
                     Sign in now
                   </Button>
                 </Box>
+                <div style={{display: 'flex', justifyContent: 'space-between'}}>
                 <Typography
                   color="textSecondary"
                   variant="body1"
@@ -217,6 +221,19 @@ const LoginView = (props) => {
                     Sign up
                   </Link>
                 </Typography>
+                <Typography
+                    style={{cursor: 'pointer'}}
+                    color="primary"
+                    variant="body1"
+                >
+                    <Link
+                        variant="h6"
+                        onClick={() => setOpenEmailForgotPass(true)}
+                    >
+                        Forgot Password ?
+                  </Link>
+                </Typography>
+                </div>
               </form>
             )}
           </Formik>
