@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ss%fa3jz4moh&nzg-8kn4spasoff)#p79vsqdp-(82g-u*qujx'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -108,9 +109,9 @@ SITE_ID=2
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'BillsReactTemplate',
-        'USER': 'postgres',
-        'PASSWORD': 'tushar007',
+        'NAME': config('DATABASE_NAME'),
+        'USER': config('DATABASE_USER_NAME'),
+        'PASSWORD': config('DATABASE_USER_PASSWORD'),
         'HOST': 'localhost'
     }
 }
