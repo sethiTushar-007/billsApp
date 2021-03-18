@@ -123,6 +123,21 @@ DATABASES = {
     }
 }
 
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': config('GOOGLE_CLIENT_ID'),
+            'secret': config('GOOGLE_SECRET'),
+        }
+    },
+    'facebook': {
+        'APP': {
+            'client_id': config('FACEBOOK_CLIENT_ID'),
+            'secret': config('FACEBOOK_SECRET'),
+        }
+    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
