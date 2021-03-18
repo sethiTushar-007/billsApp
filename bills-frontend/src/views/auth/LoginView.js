@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -36,6 +36,10 @@ const useStyles = makeStyles((theme) => ({
 const LoginView = (props) => {
     const classes = useStyles();
     const [openEmailForgotPass, setOpenEmailForgotPass] = useState(false);
+
+    useEffect(() => {
+        console.log(process.env);
+    }, []);
 
     const responseGoogle = (response) => {
         props.onSocialAuth('google', response.accessToken, response.idToken, response.profileObj.imageUrl, props.handleMessageSnackbar);
