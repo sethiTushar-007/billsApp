@@ -10,6 +10,7 @@ export const google_client_id = '315793660470-dainbj6n4qfaci4tc1pcio7dqctlnr7g.a
 /* Facebook Client ID */
 export const facebook_client_id = '482438449783753';
 
+/* Firebase Configurations */
 const firebaseConfig = {
     apiKey: "AIzaSyAkA9ynjz_t0uw_wIzicmgtQxqWY6pz0X4",
     authDomain: "firstreactapp-f0586.firebaseapp.com",

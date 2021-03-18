@@ -104,7 +104,7 @@ const NewBillDialog = (props) => {
     const [inputItem, setInputItem] = useState('');
     const [selectedItem, setSelectedItem] = useState(null);
 
-    const [quantity, setQuantity] = useState('1');
+    const [quantity, setQuantity] = useState('0');
 
     const [finalItems, setFinalItems] = useState([]);
 
@@ -181,7 +181,7 @@ const NewBillDialog = (props) => {
                             setDate(data[0]['date']);
                             setDocuments(data[0]['documents']);
                             setRemarks(data[0]['remarks']['data']);
-                            setFinalItems([...data[0]['items'].reverse()]);
+                            setFinalItems([...data[0]['items']]);
                             setTotalAmount(data[0]['amount']);
                             setInvalidBill(false);
                             initializeQuill();
@@ -254,8 +254,8 @@ const NewBillDialog = (props) => {
     }, [customer]);
 
     useEffect(() => {
-        (!selectedItem && setQuantity('1'));
-        (errorQuantity && setQuantity('1'));
+        (!selectedItem ? setQuantity('0') : setQuantity('1'));
+        (errorQuantity && setQuantity('0'));
     }, [selectedItem]);
 
     useEffect(() => {
@@ -327,7 +327,7 @@ const NewBillDialog = (props) => {
                     if (isPrintSelected) {
                         setDataToPrint({
                             customerName: customer.name,
-                            items: finalItems,
+                            items: finalItems.reverse(),
                             remarks: rmk,
                             amount: roundToTwo(Number(totalAmount)),
                             date: dateformat(new Date(), "dd mmm, yyyy - hh:MM:ss TT").toString(),
@@ -400,7 +400,7 @@ const NewBillDialog = (props) => {
             }).catch(error => console.error(error));
     }
 
-    const addItem = async (event) => {
+    const addItem = (event) => {
         event.preventDefault();
         let finalItems1 = finalItems;
         var ind = finalItems1.findIndex(value => value.no === selectedItem['no']);
@@ -408,23 +408,21 @@ const NewBillDialog = (props) => {
         if (ind === -1) {
             setFinalItems([{ name: selectedItem['name'], no: selectedItem['no'], rate: selectedItem['rate'], quantity, amount: roundToTwo(amt) }, ...finalItems1]);
         } else {
-            let new_quan = await (Number(finalItems1[ind]['quantity']) + Number(quantity)).toString();
-            let new_amount = await roundToTwo(Number(finalItems1[ind]['amount']) + Number(amt));
-            finalItems1[ind].quantity = new_quan;
-            finalItems1[ind].amount = new_amount;
-            setFinalItems([...finalItems1]);
+            let new_quan = (Number(finalItems1[ind]['quantity']) + Number(quantity)).toString();
+            let new_amount = roundToTwo(Number(finalItems1[ind]['amount']) + Number(amt));
+            finalItems1.splice(ind, 1);
+            setFinalItems([{ name: selectedItem['name'], no: selectedItem['no'], rate: selectedItem['rate'], quantity: new_quan, amount: new_amount }, ...finalItems1]);
         }
         setSelectedItem(null);
         setQuantity('0');
     }
-    const updateItem = async (event) => {
+    const updateItem = (event) => {
         event.preventDefault();
         let finalItems1 = finalItems;
-        var ind = await finalItems1.findIndex(value => value.no === currentItem['no']);
-        let amt = await roundToTwo(Number(selectedItem['rate']) * Number(quantity));
-        finalItems1[ind].quantity = quantity;
-        finalItems1[ind].amount = amt;
-        setFinalItems([...finalItems1]);
+        var ind = finalItems1.findIndex(value => value.no === currentItem['no']);
+        let amt = roundToTwo(Number(selectedItem['rate']) * Number(quantity));
+        finalItems1.splice(ind, 1);
+        setFinalItems([{ name: currentItem['name'], no: currentItem['no'], rate: currentItem['rate'], quantity, amount: amt }, ...finalItems1]);
         setSelectedItem(null);
         setCurrentItem(null);
         setQuantity('0');
