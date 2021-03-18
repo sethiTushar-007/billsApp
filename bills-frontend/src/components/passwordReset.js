@@ -55,7 +55,6 @@ const PasswordResetPage = (props) => {
             }
         }).catch(error => console.log(error));
         if (response && response.status == 200) {
-            console.log(response.data);
             setUID(response.data['uid']);
             setToken(response.data['key']);
         } else {
@@ -89,19 +88,23 @@ const PasswordResetPage = (props) => {
                         })
                     }
                     onSubmit={async (values, { setSubmitting }) => {
-                        let response = await axios.post(base_url + '/api/password-update/', {
-                            uid: uid,
-                            password: values.password1
-                        },
-                            {
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': ' Token ' + token
-                                }
-                            }).catch(error => console.error(error));
-                        if (response && response.status == 200) {
-                            props.handleMessageSnackbar('Password updated!', 'success');
-                            history.push('/login');
+                        if (values.password1 === values.password2) {
+                            let response = await axios.post(base_url + '/api/password-update/', {
+                                uid: uid,
+                                password: values.password1
+                            },
+                                {
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': ' Token ' + token
+                                    }
+                                }).catch(error => props.handleMessageSnackbar(error.response.data.error[0], 'error'));
+                            if (response && response.status == 200) {
+                                props.handleMessageSnackbar('Password updated!', 'success');
+                                history.push('/login');
+                            }
+                        } else {
+                            props.handleMessageSnackbar('Passwords do not match!', 'error');
                         }
                         setTimeout(() => {
                             setSubmitting(false);

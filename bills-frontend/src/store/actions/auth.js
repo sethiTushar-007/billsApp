@@ -140,7 +140,7 @@ export const authSocialLogin = (provider, accessToken, idToken, profilePic, hand
     }
 }
 
-export const authSignup = (username, email, password1, password2, avatar, handleMessageSnackbar) => {
+export const authSignup = (username, email, password1, password2, handleMessageSnackbar) => {
     return async dispatch => {
         var token = null;
         let response1 = await axios.post(base_url + '/rest-auth/registration/', {
@@ -151,7 +151,7 @@ export const authSignup = (username, email, password1, password2, avatar, handle
         }).catch(error => {
             handleMessageSnackbar((error.response.data['username'] && error.response.data['username'][0]) || (error.response.data['email'] && error.response.data['email'][0]) || (error.response.data['non_field_errors'] && error.response.data['non_field_errors'][0]) || (error.response.data['password1'] && error.response.data['password1'][0]) || 'Error!', 'error');
         })
-        if (response1.status==201) {
+        if (response1 && response1.status==201) {
             token = await response1.data.key;
             if (token) {
                 let response2 = await fetch(base_url + '/rest-auth/user/',
@@ -168,7 +168,7 @@ export const authSignup = (username, email, password1, password2, avatar, handle
                     body: JSON.stringify({
                         user: data1['pk'],
                         no: new Date().getTime().toString(),
-                        avatar: avatar,
+                        avatar: null,
                         email: null
                     }),
                     headers: {
@@ -176,7 +176,7 @@ export const authSignup = (username, email, password1, password2, avatar, handle
                         'Authorization': ' Token ' + token
                     }
                 })
-                if (response3.ok) {
+                if (response3.status==201) {
                     let response4 = await axios.post(base_url + '/api/send-email-confirmation/', {
                         username: username,
                     }, {

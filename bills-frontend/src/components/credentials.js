@@ -32,10 +32,6 @@ export const itemRatePattern = "^[0-9]+(\.[0-9]{0,2})?$";
 /* Item - Quantity pattern */
 export const itemQuantityPattern = "^[0-9]+(\.[0-9]{0,3})?$";
 
-/* Email Default Data */
-export const email_default_subject = 'Dino Store Bill';
-export const email_default_body = 'Please find your bill attached to this email.';
-
 /* Table Icons Size */
 export const iconsSize = 20;
 

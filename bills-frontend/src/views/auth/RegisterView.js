@@ -65,10 +65,10 @@ const RegisterView = (props) => {
             }
             onSubmit={(values, {setSubmitting}) => {
                 props.onAuth(values.username, values.email,
-                    values.password1, values.password2, null, props.handleMessageSnackbar);
+                    values.password1, values.password2, props.handleMessageSnackbar);
                 setTimeout(() => {
                     setSubmitting(false);
-                }, 3000);
+                }, 6000);
             }}
           >
             {({
@@ -231,7 +231,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        onAuth: (username, email, password1, password2, avatar, handleMessageSnackbar) => dispatch(actions.authSignup(username, email, password1, password2, avatar, handleMessageSnackbar))
+        onAuth: (username, email, password1, password2, handleMessageSnackbar) => dispatch(actions.authSignup(username, email, password1, password2, handleMessageSnackbar))
     }
 }
 

@@ -29,19 +29,20 @@ const EmailForgotPass = (props) => {
                         Yup.object().shape({
                             email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),})
                     }
-                    onSubmit={async (values) => {
+                    onSubmit={async (values, {setSubmitting}) => {
                         let response = await axios.post(base_url + '/api/send-password-reset-email/', {
                             email: values.email,
                         }, {
                             headers: {
                                 'Content-Type': 'application/json',
                             }
-                        });
+                        }).catch(error => {
+                            setSubmitting(false);
+                            props.handleMessageSnackbar(error.response.data.error, 'error');
+                        })
                         if (response && response.status == 200) {
-                            props.handleMessageSnackbar('Password Reset link sent !', 'success');
-                            props.handleClose();
-                        } else {
-                            props.handleMessageSnackbar('Error!', 'error');
+                            setSubmitting(false);
+                            props.handleMessageSnackbar('Password Reset mail sent !', 'success');
                             props.handleClose();
                         }
                     }}
@@ -51,6 +52,7 @@ const EmailForgotPass = (props) => {
                         handleBlur,
                         handleChange,
                         handleSubmit,
+                        isSubmitting,
                         touched,
                         values
                     }) => (
@@ -73,7 +75,7 @@ const EmailForgotPass = (props) => {
                                     />
                                 </DialogContent>
                                 <DialogActions>
-                                    <Button type="submit" color="primary">
+                                    <Button type="submit" color="primary" disabled={isSubmitting}>
                                         Submit
                                     </Button>
                                 </DialogActions>
