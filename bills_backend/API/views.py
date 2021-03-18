@@ -76,18 +76,19 @@ class CustomerRangeFilter(FilterSet):
     class Meta:
         model=Customer
         fields=['user', 'date']
+
 # Create your views here.
 
 class GoogleLogin(SocialLoginView):
     authentication_classes = []
     adapter_class = GoogleOAuth2Adapter
-    callback_url = "http://localhost:3000"
+    callback_url = settings.FRONTEND_URL
     client_class = OAuth2Client
 
 class FacebookLogin(SocialLoginView):
     authentication_classes = []
     adapter_class = FacebookOAuth2Adapter
-    callback_url = "http://localhost:3000"
+    callback_url = settings.FRONTEND_URL
     client_class = OAuth2Client
 
 class EmailConfirmationView(APIView):
@@ -104,7 +105,7 @@ class EmailConfirmationView(APIView):
         from_email = settings.EMAIL_HOST_USER
         to_email = [email]
 
-        url = "http://localhost:3000/account/verify/?user="+username+"&key="+str(token)
+        url = settings.FRONTEND_URL+"/account/verify/?user="+username+"&key="+str(token)
         message = get_template('verify_email.html').render({'username':username,'url':url})
         
         msg = EmailMessage(
@@ -154,7 +155,7 @@ class PasswordResetEmailView(APIView):
         from_email = settings.EMAIL_HOST_USER
         to_email = [email]
 
-        url = "http://localhost:3000/password-reset/?user="+username+"&key="+str(token)
+        url = settings.FRONTEND_URL+"/password-reset/?user="+username+"&key="+str(token)
         message = get_template('password_reset.html').render({'username':username,'url':url})
         
         msg = EmailMessage(
