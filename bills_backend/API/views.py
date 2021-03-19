@@ -225,6 +225,16 @@ class ItemCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+    def create(self, request):
+        serializer = ItemSerializer(data = request.data)
+        if serializer.is_valid():
+            item = Item.objects.filter(user=request.data['user']).filter(name=request.data['name'])
+            if item.exists() :
+                return Response({'name': 'Item with this name already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.data, status=status.HTTP_404_NOT_FOUND)
 
 class ItemGetView(generics.ListAPIView): 
     permission_classes = [IsAuthenticated]
@@ -310,6 +320,19 @@ class CustomerCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    def create(self, request):
+        serializer = CustomerSerializer(data = request.data)
+        if serializer.is_valid():
+            customer1 = Customer.objects.filter(user=request.data['user']).filter(email=request.data['email'])
+            customer2 = Customer.objects.filter(user=request.data['user']).filter(phone=request.data['phone'])
+            if customer1.exists() :
+                return Response({'email': 'Customer with this email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+            if customer2.exists():
+                return Response({'phone': 'Customer with this phone already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.data, status=status.HTTP_404_NOT_FOUND)
 
 class CustomerGetView(generics.ListAPIView): 
     permission_classes = [IsAuthenticated]

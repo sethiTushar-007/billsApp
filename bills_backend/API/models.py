@@ -19,7 +19,7 @@ class UserInfo(models.Model):
 class Item(models.Model):
     user = models.ForeignKey(User, related_name="user_item", on_delete=models.CASCADE)
     no = models.CharField(max_length=100, default=None, null=True)
-    name = models.CharField(max_length=255, default=None, null=True, unique=True)
+    name = models.CharField(max_length=255, default=None, null=True)
     date = models.DateTimeField(default=None, null=True)
     rate = models.DecimalField(max_digits=13, decimal_places=2, default=None, null=True)
 
@@ -42,5 +42,5 @@ class Customer(models.Model):
     name = models.CharField(max_length=255, default=None, null=True)
     date = models.DateTimeField(default=None, null=True)
     avatar = models.CharField(max_length=255, default=None, null=True, blank=True)
-    email = models.EmailField(max_length=255, default=None, blank=True, null=True, unique=True)
-    phone = models.CharField(max_length=20, default=None, blank=True, null=True, unique=True)
+    email = models.EmailField(max_length=255, default=None, blank=True, null=True)
+    phone = models.CharField(max_length=20, default=None, blank=True, null=True)
