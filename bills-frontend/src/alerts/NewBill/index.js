@@ -197,7 +197,7 @@ const NewBillDialog = (props) => {
             setRemarks("<p></p>");
             setDocuments([]);
             setBillId(new Date().getTime());
-            window.setTimeout(() => {
+            setTimeout(() => {
                 initializeQuill();
             }, 1000);
         }
@@ -570,7 +570,7 @@ const NewBillDialog = (props) => {
                                                 required
                                                 style={{ width: "400px" }}
                                                 id="outlined-required-selected"
-                                                value={currentItem.name + ' - ' + currentItem.no}
+                                                value={currentItem.name}
                                                 readOnly
                                                 label="Item"
                                                 variant="outlined"
@@ -586,13 +586,13 @@ const NewBillDialog = (props) => {
                                                 options={inputItem ? allItemsInSelect : []}
                                                 value={selectedItem}
                                                 getOptionSelected={(option, value) => option.no === value.no}
-                                                getOptionLabel={(option) => option.name + ' - ' + option.no}
+                                                getOptionLabel={(option) => option.name }
                                                 renderInput={(params) => (
                                                     <TextField {...params} label="Item" variant="outlined" />
                                                 )}
                                                 renderOption={(option, { inputValue }) => {
-                                                    const matches = match(option.name + ' - ' + option.no, inputValue);
-                                                    const parts = parse(option.name + ' - ' + option.no, matches);
+                                                    const matches = match(option.name, inputValue);
+                                                    const parts = parse(option.name, matches);
                                                     return (
                                                         <div>
                                                             {parts.map((part, index) => (

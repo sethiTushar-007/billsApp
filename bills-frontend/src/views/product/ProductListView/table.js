@@ -343,14 +343,14 @@ const ItemsTable = (props) => {
         setOpenConfirmAlert(!openConfirmAlert);
     }
 
-    const saveItem = (name, rate) => {
+    const saveItem = (name, rate, numbering=1) => {
         if (name && rate) {
             let no = new Date().getTime();
             axios.post(base_url + '/api/item-create/',
                 {
                     user: props.user['pk'],
                     no,
-                    name,
+                    name: `${name}_${numbering}`,
                     date: new Date(),
                     rate
                 },
@@ -362,7 +362,16 @@ const ItemsTable = (props) => {
                 }).then(response => {
                     props.handleMessageSnackbar('Item created!', 'success');
                     updateRows();
-                }).catch(error => console.error(error));
+                    return;
+                }).catch(error => {
+                    if (error.response.data.name) {
+                        saveItem(name, rate, numbering+1)
+                    } else {
+                        console.error(error);
+                        props.handleMessageSnackbar('Error!', 'error');
+                        return;
+                    }
+            });
         }
     }
     const manageUpdateItem = (item) => {

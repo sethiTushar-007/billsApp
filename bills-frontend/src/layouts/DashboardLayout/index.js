@@ -48,18 +48,14 @@ const DashboardLayout = (props) => {
     const history = useHistory();
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
 
+    const shortcut_pages = ['bills', 'customers', 'products', 'account'];
+
     useEffect(() => {
-        shortcut.add("F1", () => history.push('/bills'));
-        shortcut.add("F3", () => history.push('/customers'));
-        shortcut.add("F5", () => history.push('/products'));
-        shortcut.add("F7", () => history.push('/account'));
-        return () => {
-            shortcut.remove("F1");
-            shortcut.remove("F3");
-            shortcut.remove("F5");
-            shortcut.remove("F7");
-        }
-    }, []);
+        shortcut.remove("F5");
+        let next_page = shortcut_pages[(shortcut_pages.indexOf(props.page) + 1) % shortcut_pages.length];
+        console.log(next_page);
+        shortcut.add("F5", () => history.push(`/${next_page}`));
+    }, [props.page]);
 
     // Snackbar
     const { enqueueSnackbar } = useSnackbar();

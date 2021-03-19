@@ -48,7 +48,6 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-    { id: 'no', align: 'left', numeric: false, disablePadding: false, label: 'ID' },
     { id: 'name', align: 'left', numeric: true, disablePadding: false, label: 'Name' },
     { id: 'rate', align: 'right', numeric: true, disablePadding: true, label: 'Rate (Rs.)' },
     { id: 'quantity', align: 'right', numeric: true, disablePadding: true, label: 'Quantity' },
@@ -308,9 +307,8 @@ const ItemsTable = (props) => {
                                                 />
                                             </TableCell>
                                             <TableCell align="left" component="th" id={labelId} scope="row" padding="none">
-                                                {parseInt(row.no)}
+                                                {row.name}
                                             </TableCell>
-                                            <TableCell align="left">{row.name}</TableCell>
                                             <TableCell align="right">{Number(row.rate)}</TableCell>
                                             <TableCell align="right">{Number(row.quantity)}</TableCell>
                                             <TableCell align="right">{Number(row.amount)}</TableCell>

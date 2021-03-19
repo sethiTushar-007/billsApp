@@ -28,10 +28,10 @@ const ItemSaveDialog = (props) => {
     const saveItem = async (name, rate) => {
         if (name && rate) {
             setMessageAlert(true);
-            props.handleClose();
+            
             if (props.itemToUpdate) {
                 var id = props.itemToUpdate.id;
-                let response = await axios.patch(base_url + '/api/item-update/'+id,
+                let response = await axios.patch(base_url + '/api/item-update/' + id,
                     {
                         name,
                         rate,
@@ -42,10 +42,14 @@ const ItemSaveDialog = (props) => {
                             'Content-Type': 'application/json',
                             'Authorization': ' Token ' + props.token
                         }
+                    }).catch(error => {
+                        setMessageAlert(false);
+                        props.handleMessageSnackbar(error.response.data.name, 'error');
                     });
-                if (response.status == 200) {
+                if (response && response.status == 200) {
                     props.updateData();
                     setMessageAlert(false);
+                    props.handleClose();
                     props.handleMessageSnackbar('Item updated', 'success');
                 }
             } else {
@@ -63,11 +67,14 @@ const ItemSaveDialog = (props) => {
                             'Content-Type': 'application/json',
                             'Authorization': ' Token ' + props.token
                         }
-                    });
-                console.log(response);
-                if (response.status == 201) {
+                    }).catch(error => {
+                        setMessageAlert(false);
+                        props.handleMessageSnackbar(error.response.data.name, 'error');
+                    })
+                if (response && response.status == 201) {
                     props.updateData();
                     setMessageAlert(false);
+                    props.handleClose();
                     props.handleMessageSnackbar('Item saved', 'success');
                 }
             }
