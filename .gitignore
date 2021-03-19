@@ -1,5 +1,6 @@
 .vs/
 node_modules/
 package-lock.json
+.env
 media/
 __pycache__/
