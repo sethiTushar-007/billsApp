@@ -37,10 +37,6 @@ const LoginView = (props) => {
     const classes = useStyles();
     const [openEmailForgotPass, setOpenEmailForgotPass] = useState(false);
 
-    useEffect(() => {
-        console.log(process.env);
-    }, []);
-
     const responseGoogle = (response) => {
         props.onSocialAuth('google', response.accessToken, response.idToken, response.profileObj.imageUrl, props.handleMessageSnackbar);
     }
