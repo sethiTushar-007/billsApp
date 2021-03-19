@@ -2,22 +2,22 @@ import firebase from 'firebase/app'
 import 'firebase/storage'
 
 /* Base URL for APIs */
-export const base_url = process.env.BACKEND_URL;
+export const base_url = process.env.REACT_APP_BACKEND_URL;
 
 /* Google Client ID */
-export const google_client_id = process.env.GOOGLE_CLIENT_ID;
+export const google_client_id = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
 /* Facebook Client ID */
-export const facebook_client_id = process.env.FACEBOOK_CLIENT_ID;
+export const facebook_client_id = process.env.REACT_APP_FACEBOOK_CLIENT_ID;
 
 /* Firebase Configurations */
 const firebaseConfig = {
-    apiKey: process.env.FIREBASE_API_KEY,
-    authDomain: `${process.env.FIREBASE_PROJECT_ID}.firebaseapp.com`,
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    storageBucket: `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.FIREBASE_APP_ID
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: `${process.env.REACT_APP_FIREBASE_PROJECT_ID}.firebaseapp.com`,
+    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+    storageBucket: `${process.env.REACT_APP_FIREBASE_PROJECT_ID}.appspot.com`,
+    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
 firebase.initializeApp(firebaseConfig);
