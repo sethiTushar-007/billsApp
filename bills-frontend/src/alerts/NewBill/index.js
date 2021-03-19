@@ -197,6 +197,7 @@ const NewBillDialog = (props) => {
             setBillId(new Date().getTime());
             setTimeout(() => {
                 initializeQuill();
+                document.getElementById('customer-name').focus();
             }, 1000);
         }
     }, []);
@@ -253,6 +254,8 @@ const NewBillDialog = (props) => {
 
     useEffect(() => {
         (!selectedItem && setQuantity('1'));
+        (selectedItem && document.getElementById('item-quantity').focus());
+        (selectedItem && document.getElementById('item-quantity').select());
     }, [selectedItem]);
 
 
@@ -408,7 +411,8 @@ const NewBillDialog = (props) => {
             setFinalItems([...finalItems1]);
         }
         setSelectedItem(null);
-        setQuantity('0');
+        setQuantity('1');
+        document.getElementById('item-name').focus();
     }
     const updateItem = async (event) => {
         event.preventDefault();
@@ -420,7 +424,8 @@ const NewBillDialog = (props) => {
         setFinalItems([...finalItems1]);
         setSelectedItem(null);
         setCurrentItem(null);
-        setQuantity('0');
+        setQuantity('1');
+        document.getElementById('item-name').focus();
     }
 
     const manageUpdate = (row) => {
@@ -486,6 +491,7 @@ const NewBillDialog = (props) => {
                                             variant="outlined"
                                         />
                                         <Autocomplete
+                                            id="customer-name"
                                             value={customer}
                                             required
                                             onChange={(event, newValue) => {
@@ -518,7 +524,6 @@ const NewBillDialog = (props) => {
                                             selectOnFocus
                                             clearOnBlur
                                             handleHomeEndKeys
-                                            id="customer-name"
                                             options={customer ? allCustomersInSelect : []}
                                             getOptionLabel={(option) => {
                                                 // Value selected with enter, right from the input
@@ -570,7 +575,7 @@ const NewBillDialog = (props) => {
                                             /> :
 
                                             <Autocomplete
-                                                id="highlights-demo"
+                                                id="item-name"
                                                 style={{ width: '400px' }}
                                                 required
                                                 autoHighlight
@@ -610,6 +615,7 @@ const NewBillDialog = (props) => {
                                         />
                                     </FormControl>
                                     <TextField
+                                        id="item-quantity"
                                         style={{ margin: '10px', width: '150px' }}
                                         required
                                         value={quantity}
@@ -629,7 +635,6 @@ const NewBillDialog = (props) => {
                                                 setQuantity('0');
                                             }
                                         }}
-                                        id="outlined-required"
                                         type="number"
                                         label="Quantity"
                                         variant="outlined"

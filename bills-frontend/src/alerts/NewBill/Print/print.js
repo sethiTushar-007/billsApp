@@ -72,7 +72,7 @@ class PrintPage extends React.Component {
                             {this.props.dataToPrint.items.map((element, index) =>
                                 <tr data-iterate="item">
                                     <td>{index+1}.</td>
-                                    <td>{element.name}-{element.no}</td>
+                                    <td>{element.name}</td>
                                     <td>{element.quantity}</td>
                                     <td>{element.rate}</td>
                                     <td>{element.amount}</td>
