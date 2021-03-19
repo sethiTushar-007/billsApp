@@ -111,8 +111,6 @@ const NewBillDialog = (props) => {
     const [totalAmount, setTotalAmount] = useState(0);
     const [totalQuantity, setTotalQuantity] = useState(0);
 
-    const [errorQuantity, setErrorQuantity] = useState(false);
-
     const handlePrint = useReactToPrint({
         content: () => printPageRef.current,
         documentTitle: 'bill_id_' + billId,
@@ -255,12 +253,7 @@ const NewBillDialog = (props) => {
 
     useEffect(() => {
         (!selectedItem && setQuantity('1'));
-        (errorQuantity && setQuantity('1'));
     }, [selectedItem]);
-
-    useEffect(() => {
-        (quantity ? ((!quantity.match(itemQuantityPattern)) ? setErrorQuantity(true) : setErrorQuantity(false)) : setErrorQuantity(false));
-    }, [quantity]);
 
 
     const updateList = (newList) => {
@@ -622,9 +615,20 @@ const NewBillDialog = (props) => {
                                         value={quantity}
                                         disabled={!currentItem && !selectedItem}
                                         defaultValue='0'
-                                        onChange={(event) => setQuantity(event.target.value)}
-                                        error={errorQuantity}
-                                        helperText={errorQuantity && "This value is not acceptable."}
+                                        onChange={(event) => {
+                                            let quan = event.target.value;
+                                            if (quan) {
+                                                if (quan.length <= itemQuantityPattern.maxLength && quan.match(itemQuantityPattern.quantity)) {
+                                                    if (Number(quan) >= 0 && Number(quan) < 1) {
+                                                        setQuantity(quan);
+                                                    } else if (Number(quan) >= 1) {
+                                                        setQuantity(quan[0] === '0' ? quan.slice(1, quan.length) : quan);
+                                                    }
+                                                }
+                                            } else {
+                                                setQuantity('0');
+                                            }
+                                        }}
                                         id="outlined-required"
                                         type="number"
                                         label="Quantity"
@@ -636,7 +640,7 @@ const NewBillDialog = (props) => {
                                             id="outlined-adornment-amount"
                                             startAdornment={<InputAdornment position="start">Rs.</InputAdornment>}
                                             readOnly
-                                            value={((selectedItem && !errorQuantity) ? roundToTwo(Number(selectedItem['rate']) * Number(quantity)) : '0')}
+                                            value={((selectedItem) ? roundToTwo(Number(selectedItem['rate']) * Number(quantity)) : '0')}
                                             labelWidth={70}
                                         />
                                     </FormControl>
@@ -650,13 +654,13 @@ const NewBillDialog = (props) => {
                                         </IconButton>
                                     </Tooltip>
                                     {currentItem ?
-                                        <Tooltip title="Edit" type="submit" style={{ display: errorQuantity && 'none' }}>
+                                        <Tooltip title="Edit" type="submit">
                                             <IconButton aria-label="edit">
                                                 <EditIcon size={iconsSize}/>
                                             </IconButton>
                                         </Tooltip>
                                         :
-                                        <Tooltip title="Add" type="submit" style={{ display: (!selectedItem || errorQuantity) && 'none' }}>
+                                        <Tooltip title="Add" type="submit" style={{ display: (!selectedItem) && 'none' }}>
                                             <IconButton aria-label="add">
                                                 <AddIcon size={iconsSize}/>
                                             </IconButton>

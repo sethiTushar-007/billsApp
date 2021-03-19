@@ -11,19 +11,22 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import { itemRatePattern, base_url } from '../components/credentials.js';
 import MessageAlert from './messageAlert';
 
 const ItemSaveDialog = (props) => {
     const [messageAlert, setMessageAlert] = useState(false);
-    const [error, setError] = useState(false);
+    const [rate, setRate] = useState('0');
 
     useEffect(() => {
-        if (props.itemToUpdate) {
-            setError(false);
+        if (props.open) {
+            if (props.itemToUpdate) {
+                setRate(props.itemToUpdate.rate);
+            } else {
+                setRate('0');
+            }
         }
-    }, [props.itemToUpdate]);
+    }, [props.open]);
 
     const saveItem = async (name, rate) => {
         if (name && rate) {
@@ -85,14 +88,12 @@ const ItemSaveDialog = (props) => {
         <div>
             <MessageAlert open={messageAlert} handleClose={() => setMessageAlert(false)} message={'Saving...'} />
             <Dialog open={props.open} onClose={() => {
-                setError(false);
                 props.handleClose();
             }} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Add new item</DialogTitle>
                 <form onSubmit={(event) => {
                     event.preventDefault();
-                    setError(false);
-                    saveItem(event.target.name.value, event.target.rate.value);
+                    saveItem(event.target.name.value, rate);
                 }}>
                     <DialogContent>
                         {props.itemToUpdate && <div>
@@ -124,33 +125,34 @@ const ItemSaveDialog = (props) => {
                                 id="rate"
                                 inputProps={{ step: '0.01' }}
                                 required
-                                defaultValue={props.itemToUpdate ? props.itemToUpdate.rate : ''}
+                                value={rate}
                                 startAdornment={<InputAdornment position="start">Rs.</InputAdornment>}
                                 onChange={(event) => {
-                                    if (event.target.value) {
-                                        if ((event.target.value.length > 13 || !event.target.value.match(itemRatePattern))) {
-                                            setError(true);
-                                        } else {
-                                            setError(false);
+                                    let r = event.target.value;
+                                    if (r) {
+                                        if (r.length <= itemRatePattern.maxLength && r.match(itemRatePattern.pattern)) {
+                                            if (Number(r) >= 0 && Number(r) < 1) {
+                                                setRate(r);
+                                            } else if (Number(r) >= 1) {
+                                                setRate(r[0] === '0' ? r.slice(1, r.length) : r);
+                                            }
                                         }
+                                    } else {
+                                        setRate('0');
                                     }
                                 }}
-                                error={error}
                                 type="number"
-                                helperText={error && "This value is not acceptable."}
                                 labelWidth={50}
                             />
-                            {error && <FormHelperText style={{ color: 'red' }} id="rate-helper-text">{'{Max10}.{Max2}'}</FormHelperText>}
                         </FormControl>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => {
-                            setError(false);
                             props.handleClose();
                         }} color="primary">
                             Cancel
               </Button>
-                        <Button type="submit" color="primary" disabled={error}>
+                        <Button type="submit" color="primary">
                             Submit
               </Button>
                         </DialogActions>

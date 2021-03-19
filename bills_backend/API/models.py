@@ -33,7 +33,7 @@ class Bill(models.Model):
     documents = ArrayField(models.JSONField(), default=list, blank=True)
     items_id = ArrayField(models.CharField(max_length=20), default=list, blank=True)
     items = ArrayField(models.JSONField(), default=list, blank=True)
-    amount = models.DecimalField(max_digits=100, decimal_places=2, default=None)
+    amount = models.DecimalField(max_digits=1000, decimal_places=2, default=None)
     quantity = models.DecimalField(max_digits=12, decimal_places=3, default=None)
 
 class Customer(models.Model):
@@ -42,5 +42,5 @@ class Customer(models.Model):
     name = models.CharField(max_length=255, default=None, null=True)
     date = models.DateTimeField(default=None, null=True)
     avatar = models.CharField(max_length=255, default=None, null=True, blank=True)
-    email = models.EmailField(max_length=255, default=None, blank=True, null=True)
-    phone = models.CharField(max_length=20, default=None, blank=True, null=True)
+    email = models.EmailField(max_length=255, default=None, blank=True, null=True, unique=True)
+    phone = models.CharField(max_length=20, default=None, blank=True, null=True, unique=True)

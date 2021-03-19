@@ -58,7 +58,6 @@ const NewCustomerDialog = (props) => {
 
     const saveCustomer = async (name, email, phone) => {
         setMessageAlert(true);
-        props.handleClose();
         if (file) {
             const date_string = new Date().getTime().toString() + '.jpeg';
             storage.ref('/images/customer-avatars/' + date_string).put(file)
@@ -79,11 +78,16 @@ const NewCustomerDialog = (props) => {
                                 'Content-Type': 'application/json',
                                 'Authorization': ' Token ' + props.token
                             }
+                        }).catch(error => {
+                            storage.refFromURL(downloadURL).delete();
+                            setMessageAlert(false); 
+                            props.handleMessageSnackbar(error.response.data.email || error.response.data.phone, 'error');
                         });
-                    if (response.status == 201) {
+                    if (response && response.status == 201) {
                         setFile(null);
                         setSrc(null);
                         setMessageAlert(false);
+                        props.handleClose();
                         props.handleMessageSnackbar('Customer saved!', 'success');
                         props.updateData();
                     }
@@ -105,11 +109,15 @@ const NewCustomerDialog = (props) => {
                         'Content-Type': 'application/json',
                         'Authorization': ' Token ' + props.token
                     }
-                });
-            if (response.status==201) {
+                }).catch(error => {
+                    setMessageAlert(false);
+                    props.handleMessageSnackbar(error.response.data.email || error.response.data.phone, 'error');
+                })
+            if (response && response.status==201) {
                 setFile(null);
                 setSrc(null);
                 setMessageAlert(false);
+                props.handleClose();
                 props.handleMessageSnackbar('Customer saved!', 'success');
                 props.updateData();
             }
@@ -118,7 +126,7 @@ const NewCustomerDialog = (props) => {
     const updateCustomer = async (name, email, phone) => {
         var id = props.customerToUpdate.id;
         setMessageAlert(true);
-        props.handleClose();
+        
         if (file) {
             const date_string = new Date().getTime().toString() + '.jpeg';
             storage.ref('/images/customer-avatars/' + date_string).put(file)
@@ -141,11 +149,16 @@ const NewCustomerDialog = (props) => {
                                 'Content-Type': 'application/json',
                                 'Authorization': ' Token ' + props.token
                             }
-                        });
-                    if (response.status==200) {
+                        }).catch(error => {
+                            storage.refFromURL(downloadURL).delete();
+                            setMessageAlert(false);
+                            props.handleMessageSnackbar(error.response.data.email || error.response.data.phone, 'error');
+                        })
+                    if (response && response.status==200) {
                         setFile(null);
                         setSrc(null);
                         setMessageAlert(false);
+                        props.handleClose();
                         props.updateData();
                         props.handleMessageSnackbar('Customer updated!', 'success');
                     }
@@ -170,11 +183,15 @@ const NewCustomerDialog = (props) => {
                             'Authorization': ' Token ' + props.token
                         }
                     }
-                )
-                if (response.status == 200) {
+                ).catch(error => {
+                    setMessageAlert(false);
+                    props.handleMessageSnackbar(error.response.data.email || error.response.data.phone, 'error');
+                })
+                if (response && response.status == 200) {
                     setFile(null);
                     setSrc(null);
                     props.updateData();
+                    props.handleClose();
                     setMessageAlert(false);
                     props.handleMessageSnackbar('Customer updated!', 'success');
                 }
@@ -194,11 +211,15 @@ const NewCustomerDialog = (props) => {
                             'Authorization': ' Token ' + props.token
                         }
                     }
-                );
-                if (response.status == 200) {
+                ).catch(error => {
+                    setMessageAlert(false);
+                    props.handleMessageSnackbar(error.response.data.email || error.response.data.phone, 'error');
+                })
+                if (response && response.status == 200) {
                     setFile(null);
                     setSrc(null);
                     props.updateData();
+                    props.handleClose();
                     setMessageAlert(false);
                     props.handleMessageSnackbar('Customer updated!', 'success');
                 }

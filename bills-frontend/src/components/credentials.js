@@ -27,10 +27,10 @@ export const storage = firebase.storage();
 export const default_avatar = 'https://firebasestorage.googleapis.com/v0/b/firstreactapp-f0586.appspot.com/o/images%2Fdefault-icon%2Fuser-icon.png?alt=media&token=72ce6825-582a-47f6-a9cc-cad6a3b255f5';
 
 /* Item - Rate pattern */
-export const itemRatePattern = "^[0-9]+(\.[0-9]{0,2})?$";
+export const itemRatePattern = { maxLength: 13, pattern: "^[0-9]+(\.[0-9]{0,2})?$" };
 
 /* Item - Quantity pattern */
-export const itemQuantityPattern = "^[0-9]+(\.[0-9]{0,3})?$";
+export const itemQuantityPattern = { maxLength: 12, pattern: "^[0-9]+(\.[0-9]{0,3})?$" };
 
 /* Table Icons Size */
 export const iconsSize = 20;

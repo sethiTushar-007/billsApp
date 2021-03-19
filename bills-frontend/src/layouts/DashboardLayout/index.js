@@ -53,7 +53,6 @@ const DashboardLayout = (props) => {
     useEffect(() => {
         shortcut.remove("F5");
         let next_page = shortcut_pages[(shortcut_pages.indexOf(props.page) + 1) % shortcut_pages.length];
-        console.log(next_page);
         shortcut.add("F5", () => history.push(`/${next_page}`));
     }, [props.page]);
 
