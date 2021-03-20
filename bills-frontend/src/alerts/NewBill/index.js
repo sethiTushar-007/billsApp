@@ -398,21 +398,23 @@ const NewBillDialog = (props) => {
 
     const addItem = async (event) => {
         event.preventDefault();
-        let finalItems1 = finalItems;
-        var ind = finalItems1.findIndex(value => value.no === selectedItem['no']);
-        const amt = Number(selectedItem['rate']) * Number(quantity);
-        if (ind === -1) {
-            setFinalItems([{ name: selectedItem['name'], no: selectedItem['no'], rate: selectedItem['rate'], quantity, amount: roundToTwo(amt) }, ...finalItems1]);
-        } else {
-            let new_quan = await (Number(finalItems1[ind]['quantity']) + Number(quantity)).toString();
-            let new_amount = await roundToTwo(Number(finalItems1[ind]['amount']) + Number(amt));
-            finalItems1[ind].quantity = new_quan;
-            finalItems1[ind].amount = new_amount;
-            setFinalItems([...finalItems1]);
+        if (selectedItem) {
+            let finalItems1 = finalItems;
+            var ind = finalItems1.findIndex(value => value.no === selectedItem['no']);
+            const amt = Number(selectedItem['rate']) * Number(quantity);
+            if (ind === -1) {
+                setFinalItems([{ name: selectedItem['name'], no: selectedItem['no'], rate: selectedItem['rate'], quantity, amount: roundToTwo(amt) }, ...finalItems1]);
+            } else {
+                let new_quan = await (Number(finalItems1[ind]['quantity']) + Number(quantity)).toString();
+                let new_amount = await roundToTwo(Number(finalItems1[ind]['amount']) + Number(amt));
+                finalItems1[ind].quantity = new_quan;
+                finalItems1[ind].amount = new_amount;
+                setFinalItems([...finalItems1]);
+            }
+            setSelectedItem(null);
+            setQuantity('1');
+            document.getElementById('item-name').focus();
         }
-        setSelectedItem(null);
-        setQuantity('1');
-        document.getElementById('item-name').focus();
     }
     const updateItem = async (event) => {
         event.preventDefault();

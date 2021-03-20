@@ -235,18 +235,20 @@ const EnhancedTableToolbar = (props) => {
                         <span style={{ fontWeight: 500, fontFamily: 'roboto' }}>Date</span>
                         <MuiPickersUtilsProvider utils={DateFnsUtils}>
                             <KeyboardDatePicker
+                                placeholder="DD/MM/YYYY"
                                 style={{ marginLeft: 10, width: 200 }}
                                 value={filterStartDate}
                                 inputVariant="outlined"
-                                format="dd MMM, yyyy"
+                                format="dd/mm/yyyy"
                                 onChange={setFilterStartDate}
                                 label="From"
                             />
                             <KeyboardDatePicker
+                                placeholder="DD/MM/YYYY"
                                 style={{ marginLeft: 10, width: 200 }}
                                 value={filterEndDate}
                                 inputVariant="outlined"
-                                format="dd MMM, yyyy"
+                                format="dd/mm/yyyy"
                                 onChange={setFilterEndDate}
                                 label="To"
                             />
@@ -480,34 +482,38 @@ const BillsTable = (props) => {
     }, [filterProductsInput]);
 
     const updateRows = async () => {
-        let query = "";
-        if (searchQuery) {
-            query = query + "&search=" + searchQuery;
+        try {
+            let query = "";
+            if (searchQuery) {
+                query = query + "&search=" + searchQuery;
+            }
+            if (order && orderBy) {
+                query = query + "&ordering=" + (order === 'asc' ? '' : '-') + orderBy;
+            }
+            else {
+                query = query + "&ordering=-no";
+            }
+            if (filterAmountMin) {
+                query = query + "&amount_min=" + filterAmountMin;
+            }
+            if (filterAmountMax) {
+                query = query + "&amount_max=" + filterAmountMax;
+            }
+            if (filterProducts.length > 0) {
+                let ids = await filterProducts.map((obj) => obj.no);
+                ids.sort();
+                query = query + "&items_id=" + ids;
+            }
+            if (filterStartDate) {
+                query = query + '&date_after=' + dateformat(filterStartDate, "yyyy-mm-dd");
+            }
+            if (filterEndDate) {
+                query = query + '&date_before=' + dateformat(filterEndDate, "yyyy-mm-dd");
+            }
+            fetchAllItems(query);
+        } catch (error) {
+            console.error(error);
         }
-        if (order && orderBy) {
-            query = query + "&ordering=" + (order === 'asc' ? '' : '-') + orderBy;
-        }
-        else {
-            query = query + "&ordering=-no";
-        }
-        if (filterAmountMin) {
-            query = query + "&amount_min=" + filterAmountMin;
-        }
-        if (filterAmountMax) {
-            query = query + "&amount_max=" + filterAmountMax;
-        }
-        if (filterProducts.length > 0) {
-            let ids = await filterProducts.map((obj) => obj.no);
-            ids.sort();
-            query = query + "&items_id=" + ids;
-        }
-        if (filterStartDate) {
-            query = query + '&date_after=' + dateformat(filterStartDate, "yyyy-mm-dd");
-        }
-        if (filterEndDate) {
-            query = query + '&date_before=' + dateformat(filterEndDate, "yyyy-mm-dd");
-        }
-        fetchAllItems(query);
     }
 
     useEffect(() => {
