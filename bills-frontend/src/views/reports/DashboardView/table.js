@@ -515,29 +515,33 @@ const BillsTable = (props) => {
     }, [searchQuery, order, orderBy, page, filterAmountMin, filterAmountMax, filterProducts, filterStartDate, filterEndDate, rowsPerPage]);
 
     useEffect(() => {
-        if (isListening) {
-            mic.start();
-            mic.onend = () => {
+        try {
+            if (isListening) {
                 mic.start();
+                mic.onend = () => {
+                    mic.start();
+                }
+            } else {
+                mic.stop();
+                mic.onend = () => {
+                    console.log('Stopped mic on click');
+                }
             }
-        } else {
-            mic.stop();
-            mic.onend = () => {
-                console.log('Stopped mic on click');
+            mic.onstart = () => {
+                console.log('Mic is on');
             }
-        }
-        mic.onstart = () => {
-            console.log('Mic is on');
-        }
-        mic.onresult = event => {
-            const transcript = Array.from(event.results)
-                .map(result => result[0])
-                .map(result => result.transcript)
-                .join('')
-            setSearchQuery(transcript);
-            mic.onerror = event => {
-                console.error(event.error)
+            mic.onresult = event => {
+                const transcript = Array.from(event.results)
+                    .map(result => result[0])
+                    .map(result => result.transcript)
+                    .join('')
+                setSearchQuery(transcript);
+                mic.onerror = event => {
+                    console.error(event.error)
+                }
             }
+        } catch (error) {
+            window.location.reload();
         }
     }, [isListening]);
 

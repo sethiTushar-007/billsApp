@@ -53,6 +53,41 @@ const authStart = (state, action) => {
 const authSuccess = (state, action) => {
     return updateObject(state, {
         token: action.token,
+        billSet: {
+            openFilters: false,
+            filterProducts: [],
+            filterStartDate: null,
+            filterEndDate: null,
+            filterAmountMin: '',
+            filterAmountMax: '',
+            searchQuery: null,
+            order: null,
+            orderBy: null,
+            page: null,
+            rowsPerPage: null
+        },
+        itemSet: {
+            openFilters: false,
+            filterRateMin: '',
+            filterRateMax: '',
+            filterStartDate: null,
+            filterEndDate: null,
+            searchQuery: null,
+            order: null,
+            orderBy: null,
+            page: null,
+            rowsPerPage: null
+        },
+        customerSet: {
+            openFilters: false,
+            filterStartDate: null,
+            filterEndDate: null,
+            searchQuery: null,
+            order: null,
+            orderBy: null,
+            page: null,
+            rowsPerPage: null
+        },
         error: null,
         loading: false
     })
