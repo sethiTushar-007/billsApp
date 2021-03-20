@@ -36,6 +36,7 @@ const ItemSaveDialog = (props) => {
                 var id = props.itemToUpdate.id;
                 let response = await axios.patch(base_url + '/api/item-update/' + id,
                     {
+                        user: props.user['pk'],
                         name,
                         rate,
                         date: new Date()
