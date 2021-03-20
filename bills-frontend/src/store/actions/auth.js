@@ -24,6 +24,7 @@ export const authFail = (error) => {
 
 export const logout = () => {
     let tok = localStorage.getItem('token');
+    localStorage.clear();
     if (tok) {
         axios.post(base_url + '/rest-auth/logout/', {}, {
             headers: {
@@ -31,8 +32,6 @@ export const logout = () => {
                 'Authorization': ' Token ' + tok
             }
         });
-        localStorage.clear();
-        addUser(null);
     }
     return {
         type: actionTypes.AUTH_LOGOUT
@@ -61,9 +60,8 @@ export const authLogin = (username, password, handleMessageSnackbar) => {
             localStorage.setItem('token', token);
             localStorage.setItem('expirationDate', expirationDate);
             dispatch(authSuccess(token));
+            //window.location.reload();
             dispatch(checkAuthTimeout(3600));
-            handleMessageSnackbar('Login success !', 'success', '/bills');
-
         } catch (error) {
             handleMessageSnackbar((error.response.data['username'] && error.response.data['username'][0]) || (error.response.data['non_field_errors'] && error.response.data['non_field_errors'][0]) || 'Error!', 'error');
         }
@@ -130,9 +128,8 @@ export const authSocialLogin = (provider, accessToken, idToken, profilePic, hand
             localStorage.setItem('token', token);
             localStorage.setItem('expirationDate', expirationDate);
             dispatch(authSuccess(token));
+            //window.location.reload();
             dispatch(checkAuthTimeout(3600));
-            handleMessageSnackbar('Login success !', 'success', '/bills');
-
         } catch (error) {
             console.error(error);
             handleMessageSnackbar('Login failed !', 'error');
