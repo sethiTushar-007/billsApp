@@ -197,7 +197,11 @@ const NewBillDialog = (props) => {
             setBillId(new Date().getTime());
             setTimeout(() => {
                 initializeQuill();
-                document.getElementById('customer-name').focus();
+                try {
+                    document.getElementById('customer-name').focus();
+                } catch (error) {
+                    console.error(error);
+                }
             }, 1000);
         }
     }, []);
@@ -254,8 +258,12 @@ const NewBillDialog = (props) => {
 
     useEffect(() => {
         (!selectedItem && setQuantity('1'));
-        (selectedItem && document.getElementById('item-quantity').focus());
-        (selectedItem && document.getElementById('item-quantity').select());
+        try {
+            (selectedItem && document.getElementById('item-quantity').focus());
+            (selectedItem && document.getElementById('item-quantity').select());
+        } catch (error) {
+            console.error(error);
+        }
     }, [selectedItem]);
 
 
@@ -413,7 +421,11 @@ const NewBillDialog = (props) => {
             }
             setSelectedItem(null);
             setQuantity('1');
-            document.getElementById('item-name').focus();
+            try {
+                document.getElementById('item-name').focus();
+            } catch (error) {
+                console.error(error);
+            }
         }
     }
     const updateItem = async (event) => {
