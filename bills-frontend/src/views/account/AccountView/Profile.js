@@ -17,6 +17,7 @@ import {
 import * as actions from '../../../store/actions/auth';
 import { default_avatar, base_url, storage, allowedExtensionsForImage } from '../../../components/credentials';
 import MessageAlert from '../../../alerts/messageAlert';
+import ProfileCrop from '../../../alerts/profileCrop';
 
 const useStyles = makeStyles(() => ({
   root: {},
@@ -30,6 +31,7 @@ const Profile = (props) => {
     const classes = useStyles();
 
     const [messageAlert, setMessageAlert] = useState(false);
+    const [openProfileCrop, setOpenProfileCrop] = useState(false);
 
     const handleUploadPicture = () => {
         const input = document.createElement('input');
@@ -99,7 +101,8 @@ const Profile = (props) => {
       className={clsx(classes.root, props.className)}
       {...props}
       >
-      <MessageAlert open={messageAlert} handleClose={() => setMessageAlert(false)} message={'Uploading...'} />
+          <MessageAlert open={messageAlert} handleClose={() => setMessageAlert(false)} message={'Uploading...'} />
+          <ProfileCrop open={openProfileCrop} handleClose={() => setOpenProfileCrop(false)} />
       <CardContent>
         <Box
           alignItems="center"
@@ -148,7 +151,7 @@ const Profile = (props) => {
                       color="primary"
                       fullWidth
                       variant="text"
-                      onClick={handleUploadPicture}
+                      onClick={() => setOpenProfileCrop(true)}
                   >
                       Upload picture
                     </Button>
