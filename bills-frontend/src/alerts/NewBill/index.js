@@ -68,6 +68,9 @@ const NewBillDialog = (props) => {
     const [invalidBill, setInvalidBill] = useState(false);
 
     var printPageRef = useRef();
+    const customerRef = useRef();
+    const itemNameRef = useRef();
+    const itemQuantityRef = useRef();
 
     const [removedDocuments, setRemovedDocuments] = useState([]);
 
@@ -197,11 +200,7 @@ const NewBillDialog = (props) => {
             setBillId(new Date().getTime());
             setTimeout(() => {
                 initializeQuill();
-                try {
-                    document.getElementById('customer-name').focus();
-                } catch (error) {
-                    console.error(error);
-                }
+                customerRef.current.focus();
             }, 1000);
         }
     }, []);
@@ -258,12 +257,8 @@ const NewBillDialog = (props) => {
 
     useEffect(() => {
         (!selectedItem && setQuantity('1'));
-        try {
-            (selectedItem && document.getElementById('item-quantity').focus());
-            (selectedItem && document.getElementById('item-quantity').select());
-        } catch (error) {
-            console.error(error);
-        }
+        (selectedItem && itemQuantityRef.current.focus());
+        (selectedItem && itemQuantityRef.current.select());
     }, [selectedItem]);
 
 
@@ -421,11 +416,7 @@ const NewBillDialog = (props) => {
             }
             setSelectedItem(null);
             setQuantity('1');
-            try {
-                document.getElementById('item-name').focus();
-            } catch (error) {
-                console.error(error);
-            }
+            itemNameRef.current.focus();
         }
     }
     const updateItem = async (event) => {
@@ -439,7 +430,7 @@ const NewBillDialog = (props) => {
         setSelectedItem(null);
         setCurrentItem(null);
         setQuantity('1');
-        document.getElementById('item-name').focus();
+        itemNameRef.current.focus();
     }
 
     const manageUpdate = (row) => {
@@ -559,7 +550,7 @@ const NewBillDialog = (props) => {
                                             style={{ width: 300, margin: 20 }}
                                             freeSolo
                                             renderInput={(params) => (
-                                                <TextField {...params} label="Customer's Name" variant="outlined" />
+                                                <TextField {...params} inputRef={customerRef} label="Customer's Name" variant="outlined" />
                                             )}
                                         />
                                         {props.billData &&
@@ -600,7 +591,7 @@ const NewBillDialog = (props) => {
                                                 getOptionSelected={(option, value) => option.no === value.no}
                                                 getOptionLabel={(option) => option.name }
                                                 renderInput={(params) => (
-                                                    <TextField {...params} label="Item" variant="outlined" />
+                                                    <TextField {...params} inputRef={itemNameRef} label="Item" variant="outlined" />
                                                 )}
                                                 renderOption={(option, { inputValue }) => {
                                                     const matches = match(option.name, inputValue);
@@ -630,6 +621,7 @@ const NewBillDialog = (props) => {
                                     </FormControl>
                                     <TextField
                                         id="item-quantity"
+                                        inputRef={itemQuantityRef}
                                         style={{ margin: '10px', width: '150px' }}
                                         required
                                         value={quantity}
