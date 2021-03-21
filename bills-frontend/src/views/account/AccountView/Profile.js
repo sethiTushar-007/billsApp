@@ -16,7 +16,6 @@ import {
 } from '@material-ui/core';
 import * as actions from '../../../store/actions/auth';
 import { default_avatar, base_url, storage, allowedExtensionsForImage } from '../../../components/credentials';
-import MessageAlert from '../../../alerts/messageAlert';
 import ProfileCrop from '../../../alerts/profileCrop';
 
 const useStyles = makeStyles(() => ({
@@ -30,8 +29,8 @@ const useStyles = makeStyles(() => ({
 const Profile = (props) => {
     const classes = useStyles();
 
-    const [messageAlert, setMessageAlert] = useState(false);
     const [openProfileCrop, setOpenProfileCrop] = useState(false);
+    const [profileToCrop, setProfileToCrop] = useState(null);
 
     const handleUploadPicture = () => {
         const input = document.createElement('input');
@@ -43,37 +42,8 @@ const Profile = (props) => {
             if (!allowedExtensionsForImage.exec(file.name)) {
                 props.handleMessageSnackbar("Invalid file !", "error");
             } else {
-                setMessageAlert(true);
-                const date_string = new Date().getTime().toString() + '.jpeg';
-                try {
-                    storage.ref('/images/user-avatars/' + date_string).put(file)
-                        .then(async snapshot => {
-                            const downloadURL = await storage.ref("images/user-avatars/").child(date_string).getDownloadURL();
-                            let response = await axios.patch(base_url + '/api/userinfo-update/' + props.user.avatar_id,
-                                {
-                                    avatar: downloadURL.toString()
-                                },
-                                {
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'Authorization': ' Token ' + props.token
-                                    }
-                                }
-                            );
-                            if (response.status == 200) {
-                                setMessageAlert(false);
-                                props.handleMessageSnackbar('Picture uploaded!', 'success');
-                                if (props.user.avatar) {
-                                    let old_url = props.user.avatar;
-                                    old_url.includes('https://firebasestorage.googleapis.com/') && storage.refFromURL(old_url).delete();
-                                }
-                                props.addUser({ ...props.user, avatar: downloadURL.toString() });
-                            }
-                        })
-                } catch (error) {
-                    setMessageAlert(false);
-                    props.handleMessageSnackbar('Uploading failed!', 'error');
-                }
+                setProfileToCrop(file);
+                setOpenProfileCrop(true);
             }
         }
     }
@@ -101,8 +71,7 @@ const Profile = (props) => {
       className={clsx(classes.root, props.className)}
       {...props}
       >
-          <MessageAlert open={messageAlert} handleClose={() => setMessageAlert(false)} message={'Uploading...'} />
-          <ProfileCrop open={openProfileCrop} handleClose={() => setOpenProfileCrop(false)} />
+          < ProfileCrop open={openProfileCrop} handleClose={() => setOpenProfileCrop(false)} imageToCrop={profileToCrop} handleMessageSnackbar={props.handleMessageSnackbar} />
       <CardContent>
         <Box
           alignItems="center"
@@ -151,7 +120,7 @@ const Profile = (props) => {
                       color="primary"
                       fullWidth
                       variant="text"
-                      onClick={() => setOpenProfileCrop(true)}
+                      onClick={handleUploadPicture}
                   >
                       Upload picture
                     </Button>
