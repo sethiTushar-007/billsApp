@@ -52,6 +52,7 @@ import './styles.css';
 import { shortcut } from '../../../components/shortcuts.js';
 import MessageAlert from '../../../alerts/messageAlert';
 import mic from '../../../components/credentials.js';
+import ImportDialog from '../../../alerts/importDialog';
 
 const headCells = [
     { id: 'no', align: 'left', numeric: false, disablePadding: true, label: 'ID' },
@@ -283,6 +284,8 @@ const ItemsTable = (props) => {
 
     const [messageAlert, setMessageAlert] = useState(false);
     const [exportMenu, setExportMenu] = useState(null);
+
+    const [openImportDialog, setOpenImportDialog] = useState(false);
 
     const [openSaveItemDialog, setOpenSaveItemDialog] = useState(false);
     const [itemToUpdate, setItemToUpdate] = useState(null);
@@ -619,15 +622,21 @@ const ItemsTable = (props) => {
             {messageInAlert &&
                 <ConfirmationAlert open={openConfirmAlert} handleClose={() => handleConfirmAlert()} handleSubmit={selected.length===0 ? handleDeleteSingleItem : handleDeleteItem} message={messageInAlert} />
             }
+            <ImportDialog open={openImportDialog} handleClose={() => setOpenImportDialog(false)} handleMessageSnackbar={props.handleMessageSnackbar} updateData={updateRows} />
             <ItemSaveDialog updateData={updateRows} open={openSaveItemDialog} handleClose={() => handleSaveItemDialog()} handleMessageSnackbar={props.handleMessageSnackbar} itemToUpdate={itemToUpdate} />
             <MessageAlert open={messageAlert} handleClose={() => setMessageAlert(false)} message={'Exporting...'} />
             <Box
                 display="flex"
                 justifyContent="space-between"
             >
-                <Button aria-controls="simple-menu" aria-haspopup="true" onClick={(event) => setExportMenu(event.currentTarget)} className={classes1.exportButton}>
-                    Export
-        </Button>
+                <Box display="flex">
+                    <Button aria-controls="simple-menu" aria-haspopup="true" onClick={() => setOpenImportDialog(true)} className={classes1.exportButton}>
+                        Import
+                    </Button>
+                    <Button aria-controls="simple-menu" aria-haspopup="true" onClick={(event) => setExportMenu(event.currentTarget)} className={classes1.exportButton}>
+                            Export
+                    </Button>
+                </Box>
                 <Menu
                     id="simple-menu"
                     anchorEl={exportMenu}

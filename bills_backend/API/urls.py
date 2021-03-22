@@ -3,6 +3,7 @@ from . views import *
 
 urlpatterns = [
     path('password-update/', UpdatePasswordView.as_view()),
+    path('import-data/', ImportDataView.as_view()),
     path('send-email-confirmation/', EmailConfirmationView.as_view()),
     path('verify-email/', CheckEmailConfirmationView.as_view()),
     path('send-password-reset-email/', PasswordResetEmailView.as_view()),

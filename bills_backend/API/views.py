@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.db.models import Q
 import django.contrib.auth.password_validation as validators
 from django.core import exceptions
+from django.db import transaction
 from rest_framework.authtoken.models import Token
 import json
 import smtplib
@@ -90,6 +91,34 @@ class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
     callback_url = settings.FRONTEND_URL
     client_class = OAuth2Client
+
+class ImportDataView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+    def create(self, request):
+        data = request.data['dataToImport'].split('\n')
+        id = int(request.data['no'])
+        try:
+            with transaction.atomic():
+                for d in data:
+                    numbering = 1
+                    name = d.split('\t')[0]
+                    rate = float(d.split('\t')[1])                    
+                    while Item.objects.filter(user=request.data['user']).filter(name=name).exists():
+                        name = d.split('\t')[0] + '_' + str(numbering)
+                        numbering+=1
+                    serializer = ItemSerializer(data = {'user': request.data['user'], 'no': str(id), 'name': name, 'rate': rate, 'date': request.data['date']})
+                    print(name)
+                    print(rate)
+                    if serializer.is_valid():
+                        serializer.save()
+                        id+=1
+                    else:
+                        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except:
+            return Response({'error': 'serializer invalid'}, status=status.HTTP_404_NOT_FOUND)
 
 class EmailConfirmationView(APIView):
     permission_classes = [IsAuthenticated]
