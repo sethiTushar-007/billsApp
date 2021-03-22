@@ -108,7 +108,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bills_backend.wsgi.application'
 
-SITE_ID=2
+SITE_ID=1
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

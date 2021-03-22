@@ -5,14 +5,10 @@ import {
     Avatar,
     Box,
     Button,
-    Card,
-    CardActions,
     CardContent,
     Divider,
     Dialog, DialogContent, DialogActions, DialogTitle,
-    Typography,
     TextField,
-    makeStyles
 } from '@material-ui/core';
 import MessageAlert from './messageAlert';
 import { base_url, default_avatar, storage, allowedExtensionsForImage } from '../components/credentials.js';
