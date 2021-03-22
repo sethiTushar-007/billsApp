@@ -54,6 +54,7 @@ import getInitials from '../../../utils/getInitials';
 import SendEmailToCustomer from '../../../alerts/sendEmailToCustomer';
 import { shortcut } from '../../../components/shortcuts.js';
 import MessageAlert from '../../../alerts/messageAlert';
+import ImportDialog from '../../../alerts/importDialog';
 import mic from '../../../components/credentials.js';
 
 const headCells = [
@@ -272,6 +273,7 @@ const CustomersTable = (props) => {
     const [isListening, setIsListening] = useState(false);
 
     const [exportMenu, setExportMenu] = useState(null);
+    const [openImportDialog, setOpenImportDialog] = useState(false);
 
     const [messageAlert, setMessageAlert] = useState(false);
 
@@ -573,6 +575,7 @@ const CustomersTable = (props) => {
             {messageInAlert &&
                 <ConfirmationAlert open={openConfirmAlert} handleClose={() => handleConfirmAlert()} handleSubmit={selected.length===0 ? handleDeleteSingleItem : handleDeleteItem} message={messageInAlert} />
             }
+            <ImportDialog open={openImportDialog} handleClose={() => setOpenImportDialog(false)} handleMessageSnackbar={props.handleMessageSnackbar} updateData={updateRows} page='customers'/>
             <NewCustomerDialog updateData={updateRows} open={openNewCustomerDialog} handleClose={handleNewCustomerOpen} handleMessageSnackbar={props.handleMessageSnackbar} customerToUpdate={customerToUpdate} />
             <SendEmailToCustomer open={openSendMailToCustomer} handleClose={handleSendMailToCustomerOpen} mailTo={mailTo} handleMessageSnackbar={props.handleMessageSnackbar} />
             <MessageAlert open={messageAlert} handleClose={() => setMessageAlert(false)} message={'Exporting...'} />
@@ -580,9 +583,14 @@ const CustomersTable = (props) => {
                 display="flex"
                 justifyContent="space-between"
             >
-                <Button aria-controls="simple-menu" aria-haspopup="true" onClick={(event) => setExportMenu(event.currentTarget)} className={classes1.exportButton}>
-                    Export
-        </Button>
+                <Box display="flex">
+                    <Button aria-controls="simple-menu" aria-haspopup="true" onClick={() => setOpenImportDialog(true)} className={classes1.exportButton}>
+                        Import
+                    </Button>
+                    <Button aria-controls="simple-menu" aria-haspopup="true" onClick={(event) => setExportMenu(event.currentTarget)} className={classes1.exportButton}>
+                        Export
+                    </Button>
+                </Box>
                 <Menu
                     id="simple-menu"
                     anchorEl={exportMenu}

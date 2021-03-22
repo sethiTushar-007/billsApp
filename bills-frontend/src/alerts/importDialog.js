@@ -11,12 +11,18 @@ import MessageAlert from './messageAlert';
 import { base_url } from '../components/credentials.js';
 import { DialogContentText } from '@material-ui/core';
 
+const formats = {
+    products: ['<Product Name>---<Product Rate (do not include Rs.)>'],
+    customers: ["<Customer's Name>---<Email ID>---<Phone Number>"]
+}
+
 function ImportDialog(props) {
     const [messageAlert, setMessageAlert] = useState(false);
 
     const importData = (data) => {
         axios.post(base_url + '/api/import-data/',
             {
+                page: props.page,
                 user: props.user['pk'],
                 no: new Date().getTime(),
                 dataToImport: data,
@@ -28,12 +34,14 @@ function ImportDialog(props) {
                     'Authorization': ' Token ' + props.token
                 }
             }).then(response => {
-                props.handleMessageSnackbar('Data Imported!', 'success');
-                props.updateData();
-                props.handleClose();
+                if (response.status == 201) {
+                    props.handleMessageSnackbar('Data Imported!', 'success');
+                    props.updateData();
+                    props.handleClose();
+                }
             }).catch(error => {
                 console.error(error);
-                props.handleMessageSnackbar('Error!', 'error');
+                props.handleMessageSnackbar(error.response.data.error, 'error');
             });
     }
     return (
@@ -46,7 +54,7 @@ function ImportDialog(props) {
                     importData(event.target.body.value);
                 }}>
                     <DialogContent>
-                        <DialogContentText>Format: {'<Product Name><tab><Product Rate (do not include Rs.)>'}</DialogContentText>
+                        <DialogContentText>Format: {formats[props.page]}</DialogContentText>
                         <DialogContentText>(Do not use headers)</DialogContentText>
                         <TextField
                             style={{ marginTop: '30px', marginBottom: '30px', width: '100%' }}

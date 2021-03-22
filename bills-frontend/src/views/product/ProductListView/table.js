@@ -622,7 +622,7 @@ const ItemsTable = (props) => {
             {messageInAlert &&
                 <ConfirmationAlert open={openConfirmAlert} handleClose={() => handleConfirmAlert()} handleSubmit={selected.length===0 ? handleDeleteSingleItem : handleDeleteItem} message={messageInAlert} />
             }
-            <ImportDialog open={openImportDialog} handleClose={() => setOpenImportDialog(false)} handleMessageSnackbar={props.handleMessageSnackbar} updateData={updateRows} />
+            <ImportDialog open={openImportDialog} handleClose={() => setOpenImportDialog(false)} handleMessageSnackbar={props.handleMessageSnackbar} updateData={updateRows} page='products' />
             <ItemSaveDialog updateData={updateRows} open={openSaveItemDialog} handleClose={() => handleSaveItemDialog()} handleMessageSnackbar={props.handleMessageSnackbar} itemToUpdate={itemToUpdate} />
             <MessageAlert open={messageAlert} handleClose={() => setMessageAlert(false)} message={'Exporting...'} />
             <Box

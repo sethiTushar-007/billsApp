@@ -94,31 +94,43 @@ class FacebookLogin(SocialLoginView):
 
 class ImportDataView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
     def create(self, request):
         data = request.data['dataToImport'].split('\n')
         id = int(request.data['no'])
+        page = request.data['page']
         try:
             with transaction.atomic():
                 for d in data:
                     numbering = 1
-                    name = d.split('\t')[0]
-                    rate = float(d.split('\t')[1])                    
-                    while Item.objects.filter(user=request.data['user']).filter(name=name).exists():
-                        name = d.split('\t')[0] + '_' + str(numbering)
-                        numbering+=1
-                    serializer = ItemSerializer(data = {'user': request.data['user'], 'no': str(id), 'name': name, 'rate': rate, 'date': request.data['date']})
-                    print(name)
-                    print(rate)
-                    if serializer.is_valid():
-                        serializer.save()
-                        id+=1
+                    if page=='products':
+                        name = d.split('\t')[0]
+                        rate = float(d.split('\t')[1])                    
+                        while Item.objects.filter(user=request.data['user']).filter(name=name).exists():
+                            name = d.split('\t')[0] + '_' + str(numbering)
+                            numbering+=1
+                        serializer = ItemSerializer(data = {'user': request.data['user'], 'no': str(id), 'name': name, 'rate': rate, 'date': request.data['date']})
+                        if serializer.is_valid():
+                            serializer.save()
+                            id+=1
+                        else:
+                            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
                     else:
-                        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+                        name = d.split('\t')[0]
+                        email = d.split('\t')[1]
+                        phone = d.split('\t')[2]
+                        if Customer.objects.filter(user=request.data['user']).filter(email=email).exists():
+                            return Response({'error': 'Email repeated : '+email}, status=status.HTTP_404_NOT_FOUND)
+                        if Customer.objects.filter(user=request.data['user']).filter(phone=phone).exists():
+                            return Response({'error': 'Phone repeated : '+phone}, status=status.HTTP_404_NOT_FOUND)
+                        serializer = CustomerSerializer(data = {'user': request.data['user'], 'no': str(id), 'name': name, 'email': email, 'phone': phone, 'date': request.data['date']})
+                        if serializer.is_valid():
+                            serializer.save()
+                            id+=1
+                        else:
+                            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
-            return Response({'error': 'serializer invalid'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Data Error!'}, status=status.HTTP_404_NOT_FOUND)
 
 class EmailConfirmationView(APIView):
     permission_classes = [IsAuthenticated]
