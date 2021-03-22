@@ -82,7 +82,7 @@ const ProfileCrop = (props) => {
                     width={250}
                     height={250}
                     border={50}
-                    borderRadius={100}
+                    borderRadius={125}
                     color={[255, 255, 255, 0.6]}
                     scale={zoom}
                     rotate={rotate}
@@ -96,7 +96,7 @@ const ProfileCrop = (props) => {
                             style={{width: 150}}
                             value={zoom}
                             onChange={(event, newValue) => setZoom(newValue)}
-                            defaultValue={1.2}
+                            defaultValue={1}
                             valueLabelDisplay="auto"
                             min={0}
                             step={0.1}
@@ -113,7 +113,7 @@ const ProfileCrop = (props) => {
                             onChange={(event, newValue) => setRotate(newValue)}
                             defaultValue={0}
                             valueLabelDisplay="auto"
-                            min={0}
+                            min={-360}
                             step={1}
                             max={360}
                         />
