@@ -77,7 +77,7 @@ const NewCustomerDialog = (props) => {
                         }).catch(error => {
                             storage.refFromURL(downloadURL).delete();
                             setMessageAlert(false); 
-                            props.handleMessageSnackbar(error.response.data.email || error.response.data.phone, 'error');
+                            props.handleMessageSnackbar(error.response.data.error, 'error');
                         });
                     if (response && response.status == 201) {
                         setFile(null);
@@ -107,7 +107,7 @@ const NewCustomerDialog = (props) => {
                     }
                 }).catch(error => {
                     setMessageAlert(false);
-                    props.handleMessageSnackbar(error.response.data.email || error.response.data.phone, 'error');
+                    props.handleMessageSnackbar(error.response.data.error, 'error');
                 })
             if (response && response.status==201) {
                 setFile(null);
@@ -148,7 +148,7 @@ const NewCustomerDialog = (props) => {
                         }).catch(error => {
                             storage.refFromURL(downloadURL).delete();
                             setMessageAlert(false);
-                            props.handleMessageSnackbar(error.response.data.email || error.response.data.phone, 'error');
+                            props.handleMessageSnackbar(error.response.data.error, 'error');
                         })
                     if (response && response.status==200) {
                         setFile(null);
@@ -181,7 +181,7 @@ const NewCustomerDialog = (props) => {
                     }
                 ).catch(error => {
                     setMessageAlert(false);
-                    props.handleMessageSnackbar(error.response.data.email || error.response.data.phone, 'error');
+                    props.handleMessageSnackbar(error.response.data.error, 'error');
                 })
                 if (response && response.status == 200) {
                     setFile(null);
@@ -209,7 +209,7 @@ const NewCustomerDialog = (props) => {
                     }
                 ).catch(error => {
                     setMessageAlert(false);
-                    props.handleMessageSnackbar(error.response.data.email || error.response.data.phone, 'error');
+                    props.handleMessageSnackbar(error.response.data.error, 'error');
                 })
                 if (response && response.status == 200) {
                     setFile(null);

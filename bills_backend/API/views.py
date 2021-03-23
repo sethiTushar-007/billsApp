@@ -96,7 +96,7 @@ class ImportDataView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     def create(self, request):
         data = request.data['dataToImport'].split('\n')
-        id = int(request.data['no'])
+        id = 0
         page = request.data['page']
         try:
             with transaction.atomic():
@@ -108,29 +108,31 @@ class ImportDataView(generics.CreateAPIView):
                         while Item.objects.filter(user=request.data['user']).filter(name=name).exists():
                             name = d.split('\t')[0] + '_' + str(numbering)
                             numbering+=1
-                        serializer = ItemSerializer(data = {'user': request.data['user'], 'no': str(id), 'name': name, 'rate': rate, 'date': request.data['date']})
+                        serializer = ItemSerializer(data = {'user': request.data['user'], 'no': str(int(request.data['no'])+id), 'name': name, 'rate': rate, 'date': request.data['date']})
                         if serializer.is_valid():
                             serializer.save()
                             id+=1
                         else:
-                            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+                            raise Exception()
                     else:
                         name = d.split('\t')[0]
                         email = d.split('\t')[1]
                         phone = d.split('\t')[2]
-                        if Customer.objects.filter(user=request.data['user']).filter(email=email).exists():
-                            return Response({'error': 'Email repeated : '+email}, status=status.HTTP_404_NOT_FOUND)
-                        if Customer.objects.filter(user=request.data['user']).filter(phone=phone).exists():
-                            return Response({'error': 'Phone repeated : '+phone}, status=status.HTTP_404_NOT_FOUND)
-                        serializer = CustomerSerializer(data = {'user': request.data['user'], 'no': str(id), 'name': name, 'email': email, 'phone': phone, 'date': request.data['date']})
+                        if email:
+                            if Customer.objects.filter(user=request.data['user']).filter(email=email).exists():
+                                email = None
+                        if phone:
+                            if Customer.objects.filter(user=request.data['user']).filter(phone=phone).exists():
+                                phone = None
+                        serializer = CustomerSerializer(data = {'user': request.data['user'], 'no': str(int(request.data['no'])+id), 'name': name, 'email': email, 'phone': phone, 'date': request.data['date']})
                         if serializer.is_valid():
                             serializer.save()
                             id+=1
                         else:
-                            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+                            raise Exception()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
-            return Response({'error': 'Data Error!'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Data Error at row '+str(id+1)}, status=status.HTTP_404_NOT_FOUND)
 
 class EmailConfirmationView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -408,17 +410,17 @@ class BillDeleteView(APIView):
 
 class CustomerCreateView(generics.CreateAPIView): 
     permission_classes = [IsAuthenticated]
-    queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer
     def create(self, request):
         serializer = CustomerSerializer(data = request.data)
         if serializer.is_valid():
-            customer1 = Customer.objects.filter(user=request.data['user']).filter(email=request.data['email'])
-            customer2 = Customer.objects.filter(user=request.data['user']).filter(phone=request.data['phone'])
-            if customer1.exists() :
-                return Response({'email': 'Customer with this email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
-            if customer2.exists():
-                return Response({'phone': 'Customer with this phone already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+            if request.data['email']:
+                customer1 = Customer.objects.filter(user=request.data['user']).filter(email=request.data['email'])
+                if customer1.exists() :
+                    return Response({'error': 'Customer with this email already exists.'}, status=status.HTTP_400_BAD_REQUEST) 
+            if request.data['phone']:
+                customer2 = Customer.objects.filter(user=request.data['user']).filter(phone=request.data['phone'])
+                if customer2.exists():
+                    return Response({'error': 'Customer with this phone already exists.'}, status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
@@ -450,12 +452,14 @@ class CustomerUpdateView(generics.RetrieveUpdateDestroyAPIView):
         obj = Customer.objects.get(pk=pk)
         serializer = CustomerSerializer(obj, data = request.data)
         if serializer.is_valid():
-            customer1 = Customer.objects.filter(~Q(pk=pk)).filter(user=request.data['user']).filter(email=request.data['email'])
-            if customer1.exists() :
-                return Response({'email': 'Customer with this email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
-            customer2 = Customer.objects.filter(~Q(pk=pk)).filter(user=request.data['user']).filter(phone=request.data['phone'])
-            if customer2.exists():
-                return Response({'phone': 'Customer with this phone already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+            if request.data['email']:
+                customer1 = Customer.objects.filter(~Q(pk=pk)).filter(user=request.data['user']).filter(email=request.data['email'])
+                if customer1.exists():
+                    return Response({'error': 'Customer with this email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+            if request.data['phone']:
+                customer2 = Customer.objects.filter(~Q(pk=pk)).filter(user=request.data['user']).filter(phone=request.data['phone'])
+                if customer2.exists():
+                    return Response({'error': 'Customer with this phone already exists.'}, status=status.HTTP_400_BAD_REQUEST)
             
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
