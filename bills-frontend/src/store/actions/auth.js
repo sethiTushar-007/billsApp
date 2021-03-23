@@ -76,51 +76,20 @@ export const authSocialLogin = (provider, accessToken, idToken, profilePic, hand
                 id_token: idToken
             });
             let token = await response.data.key;
-            const response1 = await fetch(base_url + "/rest-auth/user/",
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': ' Token ' + token,
-                    }
-                });
-            const data1 = await response1.json();
 
-            const response2 = await fetch(base_url + "/api/userinfo-get/?user=" + data1['pk'],
+            let response1 = await axios.post(base_url + '/api/userinfo-create/',
                 {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': ' Token ' + token,
-                    }
-                });
-            const data2 = await response2.json();
-            if (data2.length > 0) {
-                let response3 = await axios.patch(base_url + '/api/userinfo-update/' + data2[0]['id'],
-                    {
-                        avatar: profilePic
-                    },
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': ' Token ' + token
-                        }
-                    }
-                );
-            } else {
-                let response4 = await fetch(base_url + '/api/userinfo-create/', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        user: data1['pk'],
-                        no: new Date().getTime().toString(),
-                        avatar: profilePic,
-                    }),
+                    user: response.data.user,
+                    no: new Date().getTime().toString(),
+                    avatar: profilePic,
+                },
+                {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': ' Token ' + token
                     }
-                })
-            }
+                }
+            );
             
             const expirationDate = new Date(new Date().getTime() + 3600 * 1000);
             localStorage.setItem('token', token);
@@ -150,20 +119,8 @@ export const authSignup = (username, email, password1, password2, handleMessageS
         if (response1 && response1.status==201) {
             token = await response1.data.key;
             if (token) {
-                let response2 = await fetch(base_url + '/rest-auth/user/',
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': ' Token ' + token,
-                        }
-                    }).catch(error => {
-                        dispatch(authFail());
-                        handleMessageSnackbar('Error!', 'error');
-                    });
-                let data1 = await response2.json();
-                let response3 = await axios.post(base_url + '/api/send-email-confirmation/', {
-                    user: data1['pk'],
+                let response2 = await axios.post(base_url + '/api/send-email-confirmation/', {
+                    user: response1.data.user,
                     no: new Date().getTime().toString(),
                 }, {
                     headers: {
@@ -174,7 +131,7 @@ export const authSignup = (username, email, password1, password2, handleMessageS
                     dispatch(authFail());
                     handleMessageSnackbar('Error!', 'error');
                 })
-                if (response3 && response3.status == 200) {
+                if (response2 && response2.status == 200) {
                     handleMessageSnackbar('Email verification link sent !', 'success', '/login');
                 }
             }

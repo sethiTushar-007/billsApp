@@ -253,8 +253,19 @@ class UpdatePasswordView(APIView):
 
 class UserInfoCreateView(generics.CreateAPIView): 
     permission_classes = [IsAuthenticated]
-    queryset = UserInfo.objects.all()
-    serializer_class = UserInfoSerializer
+    def create(self, request):
+        user = User.objects.get(id=request.data['user'])
+        old = UserInfo.objects.filter(user=user.id)
+        if old.exists():
+            serializer = UserInfoSerializer(old[0], data={'user': request.data['user'], 'avatar': request.data['avatar']})  
+        else:
+            serializer = UserInfoSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 class UserInfoGetView(generics.ListAPIView): 
     permission_classes = [IsAuthenticated]
