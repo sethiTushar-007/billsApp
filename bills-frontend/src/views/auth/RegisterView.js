@@ -63,12 +63,9 @@ const RegisterView = (props) => {
                 policy: Yup.boolean().oneOf([true], 'This field must be checked')
               })
             }
-            onSubmit={(values, {setSubmitting}) => {
+            onSubmit={(values) => {
                 props.onAuth(values.username, values.email,
                     values.password1, values.password2, props.handleMessageSnackbar);
-                setTimeout(() => {
-                    setSubmitting(false);
-                }, 6000);
             }}
           >
             {({
@@ -76,7 +73,6 @@ const RegisterView = (props) => {
               handleBlur,
               handleChange,
               handleSubmit,
-              isSubmitting,
               touched,
               values
             }) => (
@@ -190,7 +186,7 @@ const RegisterView = (props) => {
                 <Box my={2}>
                   <Button
                     color="primary"
-                    disabled={isSubmitting}
+                    disabled={props.loading}
                     fullWidth
                     size="large"
                     type="submit"

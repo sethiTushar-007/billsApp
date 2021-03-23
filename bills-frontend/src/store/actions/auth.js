@@ -60,7 +60,6 @@ export const authLogin = (username, password, handleMessageSnackbar) => {
             localStorage.setItem('token', token);
             localStorage.setItem('expirationDate', expirationDate);
             dispatch(authSuccess(token));
-            //window.location.reload();
             dispatch(checkAuthTimeout(3600));
         } catch (error) {
             handleMessageSnackbar((error.response.data['username'] && error.response.data['username'][0]) || (error.response.data['non_field_errors'] && error.response.data['non_field_errors'][0]) || 'Error!', 'error');
@@ -115,7 +114,6 @@ export const authSocialLogin = (provider, accessToken, idToken, profilePic, hand
                         user: data1['pk'],
                         no: new Date().getTime().toString(),
                         avatar: profilePic,
-                        email: null
                     }),
                     headers: {
                         'Content-Type': 'application/json',
@@ -128,7 +126,6 @@ export const authSocialLogin = (provider, accessToken, idToken, profilePic, hand
             localStorage.setItem('token', token);
             localStorage.setItem('expirationDate', expirationDate);
             dispatch(authSuccess(token));
-            //window.location.reload();
             dispatch(checkAuthTimeout(3600));
         } catch (error) {
             console.error(error);
@@ -139,6 +136,7 @@ export const authSocialLogin = (provider, accessToken, idToken, profilePic, hand
 
 export const authSignup = (username, email, password1, password2, handleMessageSnackbar) => {
     return async dispatch => {
+        dispatch(authStart());
         var token = null;
         let response1 = await axios.post(base_url + '/rest-auth/registration/', {
             username: username,
@@ -146,6 +144,7 @@ export const authSignup = (username, email, password1, password2, handleMessageS
             password1: password1,
             password2: password2,
         }).catch(error => {
+            dispatch(authFail());
             handleMessageSnackbar((error.response.data['username'] && error.response.data['username'][0]) || (error.response.data['email'] && error.response.data['email'][0]) || (error.response.data['non_field_errors'] && error.response.data['non_field_errors'][0]) || (error.response.data['password1'] && error.response.data['password1'][0]) || 'Error!', 'error');
         })
         if (response1 && response1.status==201) {
@@ -158,33 +157,25 @@ export const authSignup = (username, email, password1, password2, handleMessageS
                             'Content-Type': 'application/json',
                             'Authorization': ' Token ' + token,
                         }
+                    }).catch(error => {
+                        dispatch(authFail());
+                        handleMessageSnackbar('Error!', 'error');
                     });
                 let data1 = await response2.json();
-                let response3 = await fetch(base_url + '/api/userinfo-create/', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        user: data1['pk'],
-                        no: new Date().getTime().toString(),
-                        avatar: null,
-                        email: null
-                    }),
+                let response3 = await axios.post(base_url + '/api/send-email-confirmation/', {
+                    user: data1['pk'],
+                    no: new Date().getTime().toString(),
+                }, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': ' Token ' + token
                     }
+                }).catch(error => {
+                    dispatch(authFail());
+                    handleMessageSnackbar('Error!', 'error');
                 })
-                if (response3.status==201) {
-                    let response4 = await axios.post(base_url + '/api/send-email-confirmation/', {
-                        username: username,
-                    }, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': ' Token ' + token
-                        }
-                    });
-                    if (response4.status == 200) {
-                        handleMessageSnackbar('Email verification link sent !', 'success', '/login');
-                    }
+                if (response3 && response3.status == 200) {
+                    handleMessageSnackbar('Email verification link sent !', 'success', '/login');
                 }
             }
         }

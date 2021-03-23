@@ -132,33 +132,45 @@ class ImportDataView(generics.CreateAPIView):
         except:
             return Response({'error': 'Data Error!'}, status=status.HTTP_404_NOT_FOUND)
 
-class EmailConfirmationView(APIView):
+class EmailConfirmationView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
-    def post(self, request):
-        username = request.data['username']
-        user = User.objects.get(username=username)
-        email = user.email
-        user.is_active = False
-        user.save()
-        token = Token.objects.get(user = user)
-        
-        mail_subject = 'BillsApp - Email Verification'
-        from_email = settings.EMAIL_HOST_USER
-        to_email = [email]
+    def create (self, request):
+        try:
+            user = User.objects.get(id=request.data['user'])
+            email = user.email
+            user.is_active = False
+            user.save()
 
-        url = settings.FRONTEND_URL+"/account/verify/?user="+username+"&key="+str(token)
-        message = get_template('verify_email.html').render({'username':username,'url':url})
-        
-        msg = EmailMessage(
-            mail_subject,
-            message,
-            from_email,
-            to_email,
-        )
-        msg.content_subtype = "html"
-        msg.send()
+            serializer = UserInfoSerializer(data = {'user':request.data['user'], 'no': request.data['no']})
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                user.delete()
+                return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+            
+            Token.objects.get(user = user).delete()
+            token = Token.objects.get_or_create(user=user)[0]
 
-        return Response(status=status.HTTP_200_OK)
+            mail_subject = 'BillsApp - Email Verification'
+            from_email = settings.EMAIL_HOST_USER
+            to_email = [email]
+
+            url = settings.FRONTEND_URL+"/account/verify/?user="+user.username+"&key="+str(token)
+            message = get_template('verify_email.html').render({'username':user.username,'url':url})
+            
+            msg = EmailMessage(
+                mail_subject,
+                message,
+                from_email,
+                to_email,
+            )
+            msg.content_subtype = "html"
+            msg.send()
+
+            return Response(status=status.HTTP_200_OK)
+        except :
+            user.delete()
+            return Response({'error': 'Error'}, status=status.HTTP_404_NOT_FOUND)
 
 class CheckEmailConfirmationView(APIView):
     permission_classes = []
