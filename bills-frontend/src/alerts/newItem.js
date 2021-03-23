@@ -60,6 +60,7 @@ const ItemSaveDialog = (props) => {
                 let no = new Date().getTime();
                 let response = await axios.post(base_url + '/api/item-create/',
                     {
+                        status: 'save',
                         user: props.user['pk'],
                         no,
                         name,

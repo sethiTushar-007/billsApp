@@ -267,15 +267,30 @@ class ItemCreateView(generics.CreateAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     def create(self, request):
-        serializer = ItemSerializer(data = request.data)
-        if serializer.is_valid():
-            item = Item.objects.filter(user=request.data['user']).filter(name=request.data['name'])
-            if item.exists() :
-                return Response({'name': 'Item with this name already exists.'}, status=status.HTTP_400_BAD_REQUEST)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.data['status']=='save':
+            serializer = ItemSerializer(data = {'user': request.data['user'], 'no': request.data['no'], 'name': request.data['name'], 'rate': request.data['rate'], 'date': request.data['date']})
+            if serializer.is_valid():
+                item = Item.objects.filter(user=request.data['user']).filter(name=request.data['name'])
+                if item.exists() :
+                    return Response({'name': 'Item with this name already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+        elif request.data['status']=='duplicate':
+            numbering = 1
+            name = request.data['name']
+            while Item.objects.filter(user=request.data['user']).filter(name=name).exists():
+                name = request.data['name'] + '_' + str(numbering)
+                numbering+=1
+            serializer = ItemSerializer(data = {'user': request.data['user'], 'no': request.data['no'], 'name': name, 'rate': request.data['rate'], 'date': request.data['date']})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+            return Response({'name': 'Error'}, status=status.HTTP_404_NOT_FOUND)
 
 class ItemGetView(generics.ListAPIView): 
     permission_classes = [IsAuthenticated]

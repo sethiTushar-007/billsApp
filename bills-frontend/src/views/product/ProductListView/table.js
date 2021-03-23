@@ -348,14 +348,15 @@ const ItemsTable = (props) => {
         setOpenConfirmAlert(!openConfirmAlert);
     }
 
-    const saveItem = (name, rate, numbering=1) => {
+    const saveItem = (name, rate) => {
         if (name && rate) {
             let no = new Date().getTime();
             axios.post(base_url + '/api/item-create/',
                 {
+                    status: 'duplicate',
                     user: props.user['pk'],
                     no,
-                    name: `${name}_${numbering}`,
+                    name: name,
                     date: new Date(),
                     rate
                 },
@@ -365,17 +366,15 @@ const ItemsTable = (props) => {
                         'Authorization': ' Token ' + props.token
                     }
                 }).then(response => {
-                    props.handleMessageSnackbar('Item created!', 'success');
-                    updateRows();
-                    return;
-                }).catch(error => {
-                    if (error.response.data.name) {
-                        saveItem(name, rate, numbering+1)
-                    } else {
-                        console.error(error);
-                        props.handleMessageSnackbar('Error!', 'error');
+                    if (response.status == 201) {
+                        props.handleMessageSnackbar('Item created!', 'success');
+                        updateRows();
                         return;
                     }
+                }).catch(error => {
+                    console.error(error);
+                    props.handleMessageSnackbar('Error!', 'error');
+                    return;
             });
         }
     }
