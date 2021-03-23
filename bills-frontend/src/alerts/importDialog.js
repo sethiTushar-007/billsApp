@@ -12,7 +12,7 @@ import { base_url } from '../components/credentials.js';
 import { DialogContentText } from '@material-ui/core';
 
 const formats = {
-    products: ['<Product Name>---<Product Rate (do not include Rs.)>'],
+    products: ['<Product Name>---<Product Rate (number only)>'],
     customers: ["<Customer's Name>---<Email ID>---<Phone Number>"]
 }
 
