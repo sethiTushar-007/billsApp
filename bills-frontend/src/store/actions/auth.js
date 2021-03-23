@@ -90,12 +90,13 @@ export const authSocialLogin = (provider, accessToken, idToken, profilePic, hand
                     }
                 }
             );
-            
-            const expirationDate = new Date(new Date().getTime() + 3600 * 1000);
-            localStorage.setItem('token', token);
-            localStorage.setItem('expirationDate', expirationDate);
-            dispatch(authSuccess(token));
-            dispatch(checkAuthTimeout(3600));
+            if (response1.status == 201) {
+                const expirationDate = new Date(new Date().getTime() + 3600 * 1000);
+                localStorage.setItem('token', token);
+                localStorage.setItem('expirationDate', expirationDate);
+                dispatch(authSuccess(token));
+                dispatch(checkAuthTimeout(3600));
+            }
         } catch (error) {
             console.error(error);
             handleMessageSnackbar('Login failed !', 'error');
