@@ -7,8 +7,7 @@ import {
   Box,
   Button,
   Checkbox,
-    Container,
-    FormControlLabel,
+  Container,
   Link,
   TextField,
   Typography,
@@ -151,18 +150,21 @@ const RegisterView = (props) => {
                     value={values.password2}
                     variant="outlined"
                 />
-                <Box>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={showPasswords}
-                            onChange={() => setShowPasswords(!showPasswords)}
-                            color="primary"
-                        />
-                    }
-                    label="Show Passwords"
-
-                />
+                <Box
+                    alignItems="center"
+                    display="flex"
+                    ml={-1}
+                >
+                    <Checkbox
+                        checked={showPasswords}
+                        onChange={() => setShowPasswords(!showPasswords)}
+                    />
+                    <Typography
+                        color="textSecondary"
+                        variant="body1"
+                    >
+                        Show Passwords
+                    </Typography>
                 </Box>
                 <Box my={2}>
                   <Button
