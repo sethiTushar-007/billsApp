@@ -11,7 +11,7 @@ import {
   Link,
   TextField,
   Typography,
-  makeStyles
+   makeStyles,
 } from '@material-ui/core';
 
 import GoogleLogin from 'react-google-login';
@@ -67,11 +67,8 @@ const LoginView = (props) => {
               username: Yup.string().max(255).required('Username is required'),
               password: Yup.string().max(255).required('Password is required')
             })}
-            onSubmit={(values, {setSubmitting}) => {
+            onSubmit={(values) => {
                 props.onAuth(values.username, values.password, props.handleMessageSnackbar);
-                setTimeout(() => {
-                    setSubmitting(false);
-                }, 3000);
             }}
           >
             {({
@@ -193,11 +190,11 @@ const LoginView = (props) => {
                   type="password"
                   value={values.password}
                   variant="outlined"
-                />
+                 />
                 <Box my={2}>
                   <Button
                     color="primary"
-                    disabled={isSubmitting}
+                    disabled={props.loading}
                     fullWidth
                     size="large"
                     type="submit"

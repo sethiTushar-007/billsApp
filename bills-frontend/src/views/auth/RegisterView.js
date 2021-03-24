@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -7,8 +7,8 @@ import {
   Box,
   Button,
   Checkbox,
-  Container,
-  FormHelperText,
+    Container,
+    FormControlLabel,
   Link,
   TextField,
   Typography,
@@ -34,6 +34,8 @@ const RegisterView = (props) => {
   const classes = useStyles();
   const history = useHistory();
 
+  const [showPasswords, setShowPasswords] = useState(false);
+
   return (
     <Page
       className={classes.root}
@@ -52,7 +54,6 @@ const RegisterView = (props) => {
               username: '',
               password1: '',
               password2: '',
-              policy: false
             }}
             validationSchema={
               Yup.object().shape({
@@ -60,7 +61,6 @@ const RegisterView = (props) => {
                 username: Yup.string().max(255).required('Username is required'),
                 password1: Yup.string().max(255).required('Password is required'),
                 password2: Yup.string().max(255).required('Password is required'),
-                policy: Yup.boolean().oneOf([true], 'This field must be checked')
               })
             }
             onSubmit={(values) => {
@@ -132,7 +132,7 @@ const RegisterView = (props) => {
                   id="password1"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  type="password"
+                  type={showPasswords ? "text" : "password"}
                   value={values.password1}
                   variant="outlined"
                 />
@@ -147,42 +147,23 @@ const RegisterView = (props) => {
                     id="password2"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    type="password"
+                    type={showPasswords ? "text" : "password"}
                     value={values.password2}
                     variant="outlined"
                 />
-                <Box
-                  alignItems="center"
-                  display="flex"
-                  ml={-1}
-                >
-                  <Checkbox
-                    checked={values.policy}
-                    name="policy"
-                    onChange={handleChange}
-                  />
-                  <Typography
-                    color="textSecondary"
-                    variant="body1"
-                  >
-                    I have read the
-                    {' '}
-                    <Link
-                      color="primary"
-                      component={RouterLink}
-                      to="#"
-                      underline="always"
-                      variant="h6"
-                    >
-                      Terms and Conditions
-                    </Link>
-                  </Typography>
+                <Box>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={showPasswords}
+                            onChange={() => setShowPasswords(!showPasswords)}
+                            color="primary"
+                        />
+                    }
+                    label="Show Passwords"
+
+                />
                 </Box>
-                {Boolean(touched.policy && errors.policy) && (
-                  <FormHelperText error>
-                    {errors.policy}
-                  </FormHelperText>
-                )}
                 <Box my={2}>
                   <Button
                     color="primary"

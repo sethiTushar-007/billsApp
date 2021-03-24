@@ -62,6 +62,7 @@ export const authLogin = (username, password, handleMessageSnackbar) => {
             dispatch(authSuccess(token));
             dispatch(checkAuthTimeout(3600));
         } catch (error) {
+            dispatch(authFail())
             handleMessageSnackbar((error.response.data['username'] && error.response.data['username'][0]) || (error.response.data['non_field_errors'] && error.response.data['non_field_errors'][0]) || 'Error!', 'error');
         }
     }
