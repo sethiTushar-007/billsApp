@@ -206,7 +206,8 @@ const EnhancedTableToolbar = (props) => {
                                 style={{ marginLeft: 10, width: 200 }}
                                 value={filterStartDate}
                                 inputVariant="outlined"
-                                format="dd/mm/yyyy"
+                                format="dd/MM/yyyy"
+                                size="small"
                                 onChange={setFilterStartDate}
                                 label="From"
                             />
@@ -215,7 +216,8 @@ const EnhancedTableToolbar = (props) => {
                                 style={{ marginLeft: 10, width: 200 }}
                                 value={filterEndDate}
                                 inputVariant="outlined"
-                                format="dd/mm/yyyy"
+                                format="dd/MM/yyyy"
+                                size="small"
                                 onChange={setFilterEndDate}
                                 label="To"
                             />

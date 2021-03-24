@@ -216,12 +216,13 @@ const EnhancedTableToolbar = (props) => {
                             filterSelectedOptions
                             renderTags={(value, getTagProps) =>
                                 value.map((option, index) => (
-                                    <Chip variant="outlined" label={option.name} {...getTagProps({ index })} />
+                                    <Chip size="small" variant="outlined" label={option.name} {...getTagProps({ index })} />
                                 ))
                             }
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
+                                    size="small"
                                     variant="outlined"
                                     label="Product"
                                     placeholder="Product Name"
@@ -239,8 +240,9 @@ const EnhancedTableToolbar = (props) => {
                                 style={{ marginLeft: 10, width: 200 }}
                                 value={filterStartDate}
                                 inputVariant="outlined"
-                                format="dd/mm/yyyy"
+                                format="dd/MM/yyyy"
                                 onChange={setFilterStartDate}
+                                size="small"
                                 label="From"
                             />
                             <KeyboardDatePicker
@@ -248,7 +250,8 @@ const EnhancedTableToolbar = (props) => {
                                 style={{ marginLeft: 10, width: 200 }}
                                 value={filterEndDate}
                                 inputVariant="outlined"
-                                format="dd/mm/yyyy"
+                                format="dd/MM/yyyy"
+                                size="small"
                                 onChange={setFilterEndDate}
                                 label="To"
                             />
@@ -263,6 +266,7 @@ const EnhancedTableToolbar = (props) => {
                             onChange={(event) => setFilterAmountMin(event.target.value)}
                             placeholder="Min (Rs.)"
                             id="outlined"
+                            size="small"
                             type="number"
                             variant="outlined"
                         />
@@ -272,6 +276,7 @@ const EnhancedTableToolbar = (props) => {
                             onChange={(event) => setFilterAmountMax(event.target.value)}
                             placeholder="Max (Rs.)"
                             id="outlined-required"
+                            size="small"
                             type="number"
                             variant="outlined"
                         />
