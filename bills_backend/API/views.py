@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.db.models import Q
+from django.utils import timezone
 import django.contrib.auth.password_validation as validators
 from django.core import exceptions
 from django.db import transaction
@@ -43,6 +44,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 from django.core.mail import EmailMessage, send_mail, get_connection
 from django.conf import settings
+from datetime import datetime
 
 def render_to_pdf(template_src, context_dict={}):
     template = get_template(template_src)
@@ -292,6 +294,7 @@ class ItemCreateView(generics.CreateAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     def create(self, request):
+        print(datetime.now())
         if request.data['status']=='save':
             serializer = ItemSerializer(data = {'user': request.data['user'], 'no': request.data['no'], 'name': request.data['name'], 'rate': request.data['rate'], 'date': request.data['date']})
             if serializer.is_valid():
@@ -599,84 +602,83 @@ class DocumentDownloadView(APIView):
 class ExportDataView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-            if request.query_params.get('table')=='customers':
-                query_set = Customer.objects.filter(user=request.query_params.get('user')).order_by(request.query_params.get('orderBy'))
-                if request.query_params.get('searchQuery'):
-                    query_set = query_set.filter(Q(name__icontains=request.query_params.get('searchQuery')) | Q(email__icontains=request.query_params.get('searchQuery')) | Q(phone__icontains=request.query_params.get('searchQuery')))
-                if request.query_params.get('filterStartDate') or request.query_params.get('filterEndDate'):
-                    query_set = query_set.filter(date__range=[request.query_params.get('filterStartDate'), request.query_params.get('filterEndDate')])
-                data = json.loads(serialize('json', query_set))
-                columns = ['Customer ID', 'Name', 'Email', 'Phone', 'Last Updated On']
-                data_columns = ['no', 'name', 'email', 'phone', 'date']
+        if request.query_params.get('table')=='customers':
+            query_set = Customer.objects.filter(user=request.query_params.get('user')).order_by(request.query_params.get('orderBy'))
+            if request.query_params.get('searchQuery'):
+                query_set = query_set.filter(Q(name__icontains=request.query_params.get('searchQuery')) | Q(email__icontains=request.query_params.get('searchQuery')) | Q(phone__icontains=request.query_params.get('searchQuery')))
+            if request.query_params.get('filterStartDate') or request.query_params.get('filterEndDate'):
+                query_set = query_set.filter(date__range=[request.query_params.get('filterStartDate'), request.query_params.get('filterEndDate')])
+            data = json.loads(serialize('json', query_set))
+            columns = ['Customer ID', 'Name', 'Email', 'Phone', 'Last Updated On']
+            data_columns = ['no', 'name', 'email', 'phone', 'date']
 
-            elif request.query_params.get('table')=='products':
-                query_set = Item.objects.filter(user=request.query_params.get('user')).order_by(request.query_params.get('orderBy'))
-                if request.query_params.get('searchQuery'):
-                    query_set = query_set.filter(Q(no__icontains=request.query_params.get('searchQuery')) | Q(name__icontains=request.query_params.get('searchQuery')))
-                if request.query_params.get('filterStartDate') or request.query_params.get('filterEndDate'):
-                    query_set = query_set.filter(date__range=[request.query_params.get('filterStartDate'), request.query_params.get('filterEndDate')])
-                if request.query_params.get('filterRateMin') or request.query_params.get('filterRateMax'):
-                    query_set = query_set.filter(rate__gte=request.query_params.get('filterRateMin')).filter(rate__lte=request.query_params.get('filterRateMax'))
-                data = json.loads(serialize('json', query_set))
-                columns = ['Product ID', 'Name', 'Rate(Rs.)', 'Last Updated On']
-                data_columns = ['no', 'name', 'rate', 'date']
+        elif request.query_params.get('table')=='products':
+            query_set = Item.objects.filter(user=request.query_params.get('user')).order_by(request.query_params.get('orderBy'))
+            if request.query_params.get('searchQuery'):
+                query_set = query_set.filter(Q(no__icontains=request.query_params.get('searchQuery')) | Q(name__icontains=request.query_params.get('searchQuery')))
+            if request.query_params.get('filterStartDate') or request.query_params.get('filterEndDate'):
+                query_set = query_set.filter(date__range=[request.query_params.get('filterStartDate'), request.query_params.get('filterEndDate')])
+            if request.query_params.get('filterRateMin') or request.query_params.get('filterRateMax'):
+                query_set = query_set.filter(rate__gte=request.query_params.get('filterRateMin')).filter(rate__lte=request.query_params.get('filterRateMax'))
+            data = json.loads(serialize('json', query_set))
+            columns = ['Product ID', 'Name', 'Rate(Rs.)', 'Last Updated On']
+            data_columns = ['no', 'name', 'rate', 'date']
             
-            elif request.query_params.get('table')=='bills':
-                query_set = Bill.objects.filter(user=request.query_params.get('user')).order_by(request.query_params.get('orderBy'))
-                if request.query_params.get('searchQuery'):
-                    query_set = query_set.filter(Q(customer_name__icontains=request.query_params.get('searchQuery')) | Q(no__icontains=request.query_params.get('searchQuery')))
-                if request.query_params.get('filterProducts'):
-                    query_set = query_set.filter(items_id__icontains=request.query_params.get('filterProducts'))
-                if request.query_params.get('filterStartDate') or request.query_params.get('filterEndDate'):
-                    query_set = query_set.filter(date__range=[request.query_params.get('filterStartDate'), request.query_params.get('filterEndDate')])
-                if request.query_params.get('filterAmountMin') or request.query_params.get('filterAmountMax'):
-                    query_set = query_set.filter(amount__gte=request.query_params.get('filterAmountMin')).filter(amount__lte=request.query_params.get('filterAmountMax'))
-                data = json.loads(serialize('json', query_set))
-                columns = ['Bill ID', 'Bill No.', 'Customer\'s Name', 'Customer\'s Email', 'Quantity', 'Amount(Rs.)', 'Last Updated On']
-                data_columns = ['no', 'id', 'customer_name', 'customer_email', 'quantity', 'amount', 'date']
+        elif request.query_params.get('table')=='bills':
+            query_set = Bill.objects.filter(user=request.query_params.get('user')).order_by(request.query_params.get('orderBy'))
+            if request.query_params.get('searchQuery'):
+                query_set = query_set.filter(Q(customer_name__icontains=request.query_params.get('searchQuery')) | Q(no__icontains=request.query_params.get('searchQuery')))
+            if request.query_params.get('filterProducts'):
+                query_set = query_set.filter(items_id__icontains=request.query_params.get('filterProducts'))
+            if request.query_params.get('filterStartDate') or request.query_params.get('filterEndDate'):
+                query_set = query_set.filter(date__range=[request.query_params.get('filterStartDate'), request.query_params.get('filterEndDate')])
+            if request.query_params.get('filterAmountMin') or request.query_params.get('filterAmountMax'):
+                query_set = query_set.filter(amount__gte=request.query_params.get('filterAmountMin')).filter(amount__lte=request.query_params.get('filterAmountMax'))
+            data = json.loads(serialize('json', query_set))
+            columns = ['Bill ID', 'Bill No.', 'Customer\'s Name', 'Customer\'s Email', 'Quantity', 'Amount(Rs.)', 'Last Updated On']
+            data_columns = ['no', 'id', 'customer_name', 'customer_email', 'quantity', 'amount', 'date']
 
-            print(data)
-            rows = []
-            for d in data:
-                row=[]
-                for col in data_columns:
-                    if col=='date':
-                        row.append(datetime.strptime(d['fields'][col], '%Y-%m-%dT%H:%M:%S.%f%z').strftime('%d %b, %Y - %I:%M:%S %p'))
-                    elif col=='id':
-                        row.append(d['pk'])
-                    else:
-                        row.append(d['fields'][col])
-                rows.append(row)
+        rows = []
+        for d in data:
+            row=[]
+            for col in data_columns:
+                if col=='date':
+                    row.append(datetime.strptime(d['fields'][col], '%Y-%m-%dT%H:%M:%S.%f%z').strftime('%d %b, %Y - %I:%M:%S %p'))
+                elif col=='id':
+                    row.append(d['pk'])
+                else:
+                    row.append(d['fields'][col])
+            rows.append(row)
 
-            if request.query_params.get('type')=='xlsx':
-                response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                response['Content-Disposition'] = 'attachment; filename={table}_{date}.xlsx'.format(table=request.query_params.get('table'),date=str(int(datetime.now().timestamp())))
+        if request.query_params.get('type')=='xlsx':
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename={table}_{date}.xlsx'.format(table=request.query_params.get('table'),date=str(int(datetime.now().timestamp())))
 
-                workbook = Workbook()
+            workbook = Workbook()
 
-                worksheet = workbook.active
-                worksheet.title = request.query_params.get('table')+'_'+str(int(datetime.now().timestamp()))
+            worksheet = workbook.active
+            worksheet.title = request.query_params.get('table')+'_'+str(int(datetime.now().timestamp()))
 
-                row_num = 1
-                for col_num, column_title in enumerate(columns, 1):
+            row_num = 1
+            for col_num, column_title in enumerate(columns, 1):
+                cell = worksheet.cell(row=row_num, column=col_num)
+                cell.value = column_title
+                cell.font = Font(bold=True)
+                column_letter = get_column_letter(col_num)
+                column_dimensions = worksheet.column_dimensions[column_letter]
+                column_dimensions.width = 20
+
+            for row in rows:
+                row_num+=1
+                for col_num, cell_value in enumerate(row, 1):
                     cell = worksheet.cell(row=row_num, column=col_num)
-                    cell.value = column_title
-                    cell.font = Font(bold=True)
-                    column_letter = get_column_letter(col_num)
-                    column_dimensions = worksheet.column_dimensions[column_letter]
-                    column_dimensions.width = 20
+                    cell.value = cell_value
 
-                for row in rows:
-                    row_num+=1
-                    for col_num, cell_value in enumerate(row, 1):
-                        cell = worksheet.cell(row=row_num, column=col_num)
-                        cell.value = cell_value
+            workbook.save(response)
 
-                workbook.save(response)
+        else:
+            pdf = render_to_pdf('table.html', {'heading': request.query_params.get('table').capitalize(), 'headers': columns, 'data': rows})
+            response = HttpResponse(pdf)
+            response['Content-Disposition'] = "attachment; filename={table}_{date}.pdf".format(table=request.query_params.get('table'),date=str(int(datetime.now().timestamp())))
 
-            else:
-                pdf = render_to_pdf('table.html', {'heading': request.query_params.get('table').capitalize(), 'headers': columns, 'data': rows})
-                response = HttpResponse(pdf)
-                response['Content-Disposition'] = "attachment; filename={table}_{date}.pdf".format(table=request.query_params.get('table'),date=str(int(datetime.now().timestamp())))
-
-            return response
+        return response

@@ -58,6 +58,7 @@ function ImportDialog(props) {
                         <DialogContentText>(Do not use headers)</DialogContentText>
                         <TextField
                             style={{ marginTop: '30px', marginBottom: '30px', width: '100%' }}
+                            autoFocus
                             id="body"
                             label="Body"
                             required
