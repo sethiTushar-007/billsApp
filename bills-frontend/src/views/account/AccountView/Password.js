@@ -7,10 +7,10 @@ import {
   Box,
   Button,
   Card,
-  CardContent,
+  CardContent,Checkbox,
   CardHeader,
   Divider,
-  TextField,
+  TextField,Typography,
   makeStyles
 } from '@material-ui/core';
 import * as actions from '../../../store/actions/auth';
@@ -21,7 +21,10 @@ const useStyles = makeStyles(({
 }));
 
 const Password = (props) => {
-  const classes = useStyles();
+    const classes = useStyles();
+
+    const [showPasswords, setShowPasswords] = useState(false);
+
   const [values, setValues] = useState({
     password: '',
     confirm: ''
@@ -76,7 +79,7 @@ const Password = (props) => {
             margin="normal"
             name="password"
             onChange={handleChange}
-            type="password"
+            type={showPasswords ? "text" : "password"}
             value={values.password}
             variant="outlined"
           />
@@ -87,7 +90,7 @@ const Password = (props) => {
             margin="normal"
             name="confirm"
             onChange={handleChange}
-            type="password"
+            type={showPasswords ? "text" : "password"}
             value={values.confirm}
             variant="outlined"
           />
@@ -95,9 +98,25 @@ const Password = (props) => {
         <Divider />
         <Box
           display="flex"
-          justifyContent="flex-end"
+          justifyContent="space-between"
           p={2}
         >
+            <Box
+                alignItems="center"
+                display="flex"
+                ml={-1}
+            >
+                <Checkbox
+                    checked={showPasswords}
+                    onChange={() => setShowPasswords(!showPasswords)}
+                />
+                <Typography
+                    color="textSecondary"
+                    variant="body1"
+                >
+                    Show Passwords
+            </Typography>
+            </Box>
           <Button
             color="primary"
             variant="contained"
