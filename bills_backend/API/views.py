@@ -45,6 +45,7 @@ from rest_framework import status
 from django.core.mail import EmailMessage, send_mail, get_connection
 from django.conf import settings
 from datetime import datetime
+from pytz import timezone
 
 def render_to_pdf(template_src, context_dict={}):
     template = get_template(template_src)
@@ -643,7 +644,7 @@ class ExportDataView(APIView):
             row=[]
             for col in data_columns:
                 if col=='date':
-                    row.append(datetime.strptime(d['fields'][col], '%Y-%m-%dT%H:%M:%S.%f%z').strftime('%d %b, %Y - %I:%M:%S %p'))
+                    row.append(datetime.strptime(d['fields'][col], '%Y-%m-%dT%H:%M:%S.%f%z').astimezone(timezone(request.query_params.get('timezone'))).strftime('%d %b, %Y - %I:%M:%S %p'))
                 elif col=='id':
                     row.append(d['pk'])
                 else:

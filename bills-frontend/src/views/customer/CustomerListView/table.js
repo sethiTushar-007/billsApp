@@ -147,6 +147,14 @@ const useToolbarStyles = makeStyles((theme) => ({
 const EnhancedTableToolbar = (props) => {
     const classes = useToolbarStyles();
     const { openFilters, handleOpenFilters, filterStartDate, filterEndDate, setFilterStartDate, setFilterEndDate, numSelected, handleAlert } = props;
+    var startDateProps = {}
+    var endDateProps = {}
+    if (filterStartDate) {
+        endDateProps.minDate = filterStartDate;
+    }
+    if (filterEndDate) {
+        startDateProps.maxDate = filterEndDate;
+    }
     return (
         <div>
             <Toolbar
@@ -202,6 +210,7 @@ const EnhancedTableToolbar = (props) => {
                         <span style={{ fontWeight: 500, fontFamily: 'roboto' }}>Date</span>
                         <MuiPickersUtilsProvider utils={DateFnsUtils}>
                             <KeyboardDatePicker
+                                {...startDateProps}
                                 placeholder="DD/MM/YYYY"
                                 style={{ marginLeft: 10, width: 200 }}
                                 value={filterStartDate}
@@ -212,6 +221,7 @@ const EnhancedTableToolbar = (props) => {
                                 label="From"
                             />
                             <KeyboardDatePicker
+                                {...endDateProps}
                                 placeholder="DD/MM/YYYY"
                                 style={{ marginLeft: 10, width: 200 }}
                                 value={filterEndDate}
@@ -410,29 +420,33 @@ const CustomersTable = (props) => {
     }, [openFilters, searchQuery, order, orderBy, page, filterStartDate, filterEndDate, rowsPerPage]);
 
     useEffect(() => {
-        if (isListening) {
-            mic.start();
-            mic.onend = () => {
+        try {
+            if (isListening) {
                 mic.start();
+                mic.onend = () => {
+                    mic.start();
+                }
+            } else {
+                mic.stop();
+                mic.onend = () => {
+                    console.log('Mic is off');
+                }
             }
-        } else {
-            mic.stop();
-            mic.onend = () => {
-                console.log('Mic is off');
+            mic.onstart = () => {
+                console.log('Mic is on');
             }
-        }
-        mic.onstart = () => {
-            console.log('Mic is on');
-        }
-        mic.onresult = event => {
-            const transcript = Array.from(event.results)
-                .map(result => result[0])
-                .map(result => result.transcript)
-                .join('')
-            setSearchQuery(transcript);
-            mic.onerror = event => {
-                console.error(event.error)
+            mic.onresult = event => {
+                const transcript = Array.from(event.results)
+                    .map(result => result[0])
+                    .map(result => result.transcript)
+                    .join('')
+                setSearchQuery(transcript);
+                mic.onerror = event => {
+                    console.error(event.error)
+                }
             }
+        } catch (error) {
+            window.location.reload();
         }
     }, [isListening]);
 
@@ -551,6 +565,7 @@ const CustomersTable = (props) => {
         setExportMenu(false);
         axios.get(base_url + '/api/export-data/', {
             params: {
+                'timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
                 'user': props.user['pk'],
                 'type': type,
                 'table': 'customers',

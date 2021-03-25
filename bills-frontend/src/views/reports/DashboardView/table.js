@@ -64,7 +64,7 @@ import mic from '../../../components/credentials.js';
 const headCells = [
     { id: 'id', align: 'left', numeric: false, disablePadding: true, label: 'ID' },
     { id: 'no', align: 'left', numeric: true, disablePadding: false, label: 'Bill No.' },
-    { id: 'customer_name', align: 'left', numeric: false, disablePadding: false, label: "Customer's Name" },
+    { id: 'customer_name', align: 'left', numeric: false, disablePadding: false, label: "Bill To" },
     { id: 'amount', align: 'right', numeric: false, disablePadding: false, label: 'Amount' },
     { id: 'date', align: 'right', numeric: false, disablePadding: false, label: 'Last Updated on' },
     { id: 'icons', numeric: false, disablePadding: true, label: '' }
@@ -146,7 +146,14 @@ const useToolbarStyles = makeStyles((theme) => ({
 const EnhancedTableToolbar = (props) => {
     const classes = useToolbarStyles();
     const { openFilters, handleOpenFilters, productsData, filterProductsInput, setFilterProductsInput, filterProducts, setFilterProducts, filterStartDate, setFilterStartDate, filterEndDate, setFilterEndDate, filterAmountMin, filterAmountMax, setFilterAmountMin, setFilterAmountMax, numSelected, handleAlert } = props;
-
+    var startDateProps = {}
+    var endDateProps = {}
+    if (filterStartDate) {
+        endDateProps.minDate = filterStartDate;
+    }
+    if (filterEndDate) {
+        startDateProps.maxDate = filterEndDate;
+    }
     return (
         <div>
             <Toolbar
@@ -236,6 +243,7 @@ const EnhancedTableToolbar = (props) => {
                         <span style={{ fontWeight: 500, fontFamily: 'roboto' }}>Date</span>
                         <MuiPickersUtilsProvider utils={DateFnsUtils}>
                             <KeyboardDatePicker
+                                {...startDateProps}
                                 placeholder="DD/MM/YYYY"
                                 style={{ marginLeft: 10, width: 200 }}
                                 value={filterStartDate}
@@ -246,6 +254,7 @@ const EnhancedTableToolbar = (props) => {
                                 label="From"
                             />
                             <KeyboardDatePicker
+                                {...endDateProps}
                                 placeholder="DD/MM/YYYY"
                                 style={{ marginLeft: 10, width: 200 }}
                                 value={filterEndDate}
@@ -716,6 +725,7 @@ const BillsTable = (props) => {
         setMessageAlert(true);
         axios.get(base_url + '/api/export-data/', {
             params: {
+                'timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
                 'user': props.user['pk'],
                 'type': type,
                 'table': 'bills',
