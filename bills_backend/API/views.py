@@ -295,7 +295,6 @@ class ItemCreateView(generics.CreateAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     def create(self, request):
-        print(datetime.now())
         if request.data['status']=='save':
             serializer = ItemSerializer(data = {'user': request.data['user'], 'no': request.data['no'], 'name': request.data['name'], 'rate': request.data['rate'], 'date': request.data['date']})
             if serializer.is_valid():
