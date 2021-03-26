@@ -58,7 +58,7 @@ const FileUpload = (props) => {
             } else {
                 setProgress(true);
                 const date_string = new Date().getTime();
-                const fileName = date_string + '_' + file.name;
+                const fileName = date_string + '_' + file.name.replaceAll(" ", "");
                 let formData = new FormData();
                 formData.append('userid', props.user.avatar_no);
                 formData.append('fileName', fileName);
