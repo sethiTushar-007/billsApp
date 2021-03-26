@@ -606,8 +606,10 @@ class ExportDataView(APIView):
             query_set = Customer.objects.filter(user=request.query_params.get('user')).order_by(request.query_params.get('orderBy'))
             if request.query_params.get('searchQuery'):
                 query_set = query_set.filter(Q(name__icontains=request.query_params.get('searchQuery')) | Q(email__icontains=request.query_params.get('searchQuery')) | Q(phone__icontains=request.query_params.get('searchQuery')))
-            if request.query_params.get('filterStartDate') or request.query_params.get('filterEndDate'):
-                query_set = query_set.filter(date__range=[request.query_params.get('filterStartDate'), request.query_params.get('filterEndDate')])
+            if request.query_params.get('filterStartDate'):
+                query_set = query_set.filter(date__gte=request.query_params.get('filterStartDate'))
+            if request.query_params.get('filterEndDate'):
+                query_set = query_set.filter(date__lte=request.query_params.get('filterEndDate'))
             data = json.loads(serialize('json', query_set))
             columns = ['Customer ID', 'Name', 'Email', 'Phone', 'Last Updated On']
             data_columns = ['no', 'name', 'email', 'phone', 'date']
@@ -616,10 +618,14 @@ class ExportDataView(APIView):
             query_set = Item.objects.filter(user=request.query_params.get('user')).order_by(request.query_params.get('orderBy'))
             if request.query_params.get('searchQuery'):
                 query_set = query_set.filter(Q(no__icontains=request.query_params.get('searchQuery')) | Q(name__icontains=request.query_params.get('searchQuery')))
-            if request.query_params.get('filterStartDate') or request.query_params.get('filterEndDate'):
-                query_set = query_set.filter(date__range=[request.query_params.get('filterStartDate'), request.query_params.get('filterEndDate')])
-            if request.query_params.get('filterRateMin') or request.query_params.get('filterRateMax'):
-                query_set = query_set.filter(rate__gte=request.query_params.get('filterRateMin')).filter(rate__lte=request.query_params.get('filterRateMax'))
+            if request.query_params.get('filterStartDate'):
+                query_set = query_set.filter(date__gte=request.query_params.get('filterStartDate'))
+            if request.query_params.get('filterEndDate'):
+                query_set = query_set.filter(date__lte= request.query_params.get('filterEndDate'))
+            if request.query_params.get('filterRateMin') :
+                query_set = query_set.filter(rate__gte=request.query_params.get('filterRateMin'))
+            if request.query_params.get('filterRateMax'):
+                query_set = query_set.filter(rate__lte=request.query_params.get('filterRateMax'))
             data = json.loads(serialize('json', query_set))
             columns = ['Product ID', 'Name', 'Rate(Rs.)', 'Last Updated On']
             data_columns = ['no', 'name', 'rate', 'date']
@@ -630,10 +636,15 @@ class ExportDataView(APIView):
                 query_set = query_set.filter(Q(customer_name__icontains=request.query_params.get('searchQuery')) | Q(no__icontains=request.query_params.get('searchQuery')))
             if request.query_params.get('filterProducts'):
                 query_set = query_set.filter(items_id__icontains=request.query_params.get('filterProducts'))
-            if request.query_params.get('filterStartDate') or request.query_params.get('filterEndDate'):
-                query_set = query_set.filter(date__range=[request.query_params.get('filterStartDate'), request.query_params.get('filterEndDate')])
-            if request.query_params.get('filterAmountMin') or request.query_params.get('filterAmountMax'):
-                query_set = query_set.filter(amount__gte=request.query_params.get('filterAmountMin')).filter(amount__lte=request.query_params.get('filterAmountMax'))
+            if request.query_params.get('filterStartDate'):
+                query_set = query_set.filter(date__gte=request.query_params.get('filterStartDate'))
+            if request.query_params.get('filterEndDate'):
+                query_set = query_set.filter(date__lte=request.query_params.get('filterEndDate'))
+            if request.query_params.get('filterAmountMin'):
+                query_set = query_set.filter(amount__gte=request.query_params.get('filterAmountMin'))
+            if request.query_params.get('filterAmountMax'):
+                query_set = query_set.filter(amount__lte=request.query_params.get('filterAmountMax'))
+                
             data = json.loads(serialize('json', query_set))
             columns = ['Bill ID', 'Bill No.', 'Customer\'s Name', 'Customer\'s Email', 'Quantity', 'Amount(Rs.)', 'Last Updated On']
             data_columns = ['no', 'id', 'customer_name', 'customer_email', 'quantity', 'amount', 'date']
