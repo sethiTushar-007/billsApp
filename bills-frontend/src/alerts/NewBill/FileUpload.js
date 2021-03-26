@@ -57,11 +57,6 @@ const FileUpload = (props) => {
                 return;
             } else {
                 setProgress(true);
-                /*
-                var reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => console.log(reader.result);
-                */
                 const date_string = new Date().getTime();
                 const fileName = date_string + '_' + file.name;
                 let formData = new FormData();
