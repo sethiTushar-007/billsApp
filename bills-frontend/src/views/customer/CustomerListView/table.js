@@ -170,7 +170,7 @@ const EnhancedTableToolbar = (props) => {
                     </Tooltip>
                 ) : (
                         <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
-                            Items
+                            Customers
                         </Typography>
                     )}
             
