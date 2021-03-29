@@ -134,6 +134,7 @@ export const authSignup = (username, email, password1, password2, handleMessageS
                     handleMessageSnackbar('Error!', 'error');
                 })
                 if (response2 && response2.status == 200) {
+                    dispatch(authSuccess(null));
                     handleMessageSnackbar('Email verification link sent !', 'success', '/login');
                 }
             }
