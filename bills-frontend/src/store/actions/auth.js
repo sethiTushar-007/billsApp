@@ -23,16 +23,7 @@ export const authFail = (error) => {
 }
 
 export const logout = () => {
-    let tok = localStorage.getItem('token');
     localStorage.clear();
-    if (tok) {
-        axios.post(base_url + '/rest-auth/logout/', {}, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': ' Token ' + tok
-            }
-        });
-    }
     return {
         type: actionTypes.AUTH_LOGOUT
     }
